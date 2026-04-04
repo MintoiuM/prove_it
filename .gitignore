@@ -1,2 +1,4 @@
 .env
 .env.example
+ssh_key
+ssh_key.pub
