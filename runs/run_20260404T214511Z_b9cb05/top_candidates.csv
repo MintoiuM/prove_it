@@ -1,0 +1,11 @@
+clay_pct,confidence,country,frost_risk,hard_violations,humidity_pct,lat,lon,mean_temp_c,missing_features,nuts_region,point_id,rainfall_mm,rules_reasoning,score,score_band,soil_error,soil_ok,soil_organic_carbon_gkg,soil_ph,temp_std_c,weather_error,weather_ok,weather_stress_ratio,wind_speed_10m_kmh
+24.7,0.817,Germany,0.0,"[""mean_temp_c""]",58.217,48.309268,11.522182,8.768,"[""soil_moisture_1_3cm"", ""sand_pct"", ""et0_mm""]",Bayern,P001,151.11,"Best-ranked site P001 for Barley scores 63.3% (good), based on matching weather and soil signals to crop-specific ideal and limit ranges. Confidence reflects how many inputs were present (about 82% here).
+
+What looks strong: Relative humidity (58.2%) is within the ideal band (47.28–71.28) for Barley. Frost exposure (0.0% of hours at or below freezing) is within the ideal band (0–0.5) for Barley. Rainfall (151 mm (annualized)) is within the ideal band (150–1400) for Barley. Soil pH (6.31) is within the ideal band (5–8.5) for Barley. Soil organic carbon (20.1 g/kg) is within the ideal band (4–50) for Barley. Wind speed (10.6 km/h) is within the ideal band (0–40) for Barley. Severe-weather stress (0.0% of hours with severe weather codes) is within the ideal band (0–0.35) for Barley.
+
+What is acceptable but not ideal: Clay content is 24.7%, above the ideal range (0–24) but still inside acceptable bounds (0–100), which can add stress or management needs.
+
+What works against the site: Mean temperature is 8.8 °C, outside the viable range (12.18–48) for Barley (ideal 25.18–35.18). This heavily penalizes suitability.
+
+Data limitations: no values for Surface soil moisture, Sand content, Reference evapotranspiration (ET0). Those gaps reduce confidence and apply a scoring penalty.",63.276,good,,True,20.126,6.31,4.371,,True,0.0,10.592
+26.0,0.817,Germany,0.0,"[""mean_temp_c""]",57.833,50.063746,10.667887,8.805,"[""soil_moisture_1_3cm"", ""sand_pct"", ""et0_mm""]",Bayern,P002,208.05,,63.077,good,,True,17.748,6.67,3.925,,True,0.0,10.221

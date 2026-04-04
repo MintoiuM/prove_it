@@ -7,4 +7,5 @@ class CandidatePoint:
     country: str
     lat: float
     lon: float
+    region: str | None = None
 

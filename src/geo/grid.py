@@ -29,6 +29,7 @@ COUNTRY_ENVELOPES: dict[str, CountryEnvelope] = {
     "belgium": CountryEnvelope("Belgium", 49.4, 51.6, 2.5, 6.4),
     "portugal": CountryEnvelope("Portugal", 36.8, 42.2, -9.6, -6.2),
     "hungary": CountryEnvelope("Hungary", 45.7, 48.6, 16.0, 22.9),
+    "greece": CountryEnvelope("Greece", 34.8, 41.8, 19.0, 29.0),
 }
 
 # Simplified mainland borders for rejection sampling.
@@ -149,6 +150,26 @@ COUNTRY_POLYGONS: dict[str, list[tuple[float, float]]] = {
         (47.20, 16.05),
         (47.90, 17.10),
     ],
+    # Simplified outline (mainland + major islands); Natural Earth overrides when cached.
+    "greece": [
+        (41.52, 26.35),
+        (40.95, 23.85),
+        (40.15, 22.35),
+        (39.05, 22.05),
+        (38.25, 23.15),
+        (37.45, 22.95),
+        (36.35, 23.55),
+        (35.65, 24.85),
+        (35.05, 25.95),
+        (35.20, 27.35),
+        (36.45, 28.15),
+        (38.25, 27.45),
+        (39.85, 26.55),
+        (40.85, 25.45),
+        (41.35, 23.85),
+        (41.70, 21.75),
+        (41.25, 20.35),
+    ],
 }
 
 COUNTRY_ALIASES = {
@@ -156,6 +177,8 @@ COUNTRY_ALIASES = {
     "deutschland": "germany",
     "españa": "spain",
     "italia": "italy",
+    "hellas": "greece",
+    "ελλάδα": "greece",
 }
 
 BOUNDARY_SOURCE_URL = (
@@ -184,10 +207,15 @@ def ensure_supported_european_country(country: str) -> CountryEnvelope:
 
 
 def generate_candidate_points(
-    country: str, point_count: int = 100, seed: int = 42
+    country: str,
+    point_count: int = 100,
+    seed: int = 42,
+    region: str | None = None,
 ) -> list[CandidatePoint]:
     if point_count <= 0:
         raise ValueError("point_count must be a positive integer")
+
+    from src.geo import nuts as nuts_geo
 
     normalized_country = normalize_country_name(country)
     envelope = ensure_supported_european_country(country)
@@ -198,23 +226,58 @@ def generate_candidate_points(
             raise ValueError(f"No border polygon configured for country '{country}'.")
         polygons = [polygon]
 
-    lat_min, lat_max, lon_min, lon_max = _bbox_for_polygons(polygons)
+    region_trim = (region or "").strip()
+    region_polys: list[list[tuple[float, float]]] | None = None
+    point_region: str | None = None
+
+    if region_trim:
+        if nuts_geo._fold_key(region_trim) == nuts_geo._fold_key(envelope.name):
+            region_polys = None
+            point_region = region_trim
+        else:
+            iso = nuts_geo.country_name_to_nuts_iso(normalized_country)
+            if not iso:
+                raise ValueError(
+                    f"NUTS sub-country regions are not configured for {envelope.name}."
+                )
+            region_polys = nuts_geo.region_label_to_polygons(iso, region_trim)
+            if not region_polys:
+                raise ValueError(
+                    f"No NUTS geometry matched region '{region_trim}' in {envelope.name}. "
+                    "Choose a region from the validated list, use the country name for the "
+                    "whole territory, or clear the region field."
+                )
+            point_region = region_trim
+
+    if region_polys:
+        sample_bbox = nuts_geo.sampling_bbox_for_region_polys(region_polys, polygons)
+        if sample_bbox is None:
+            sample_bbox = nuts_geo._bbox_for_polygons(region_polys)
+        lat_min, lat_max, lon_min, lon_max = sample_bbox
+    else:
+        lat_min, lat_max, lon_min, lon_max = _bbox_for_polygons(polygons)
 
     rng = random.Random(seed)
     points: list[CandidatePoint] = []
     attempts = 0
-    max_attempts = point_count * 500
+    max_attempts = point_count * 800
 
     while len(points) < point_count:
         attempts += 1
         if attempts > max_attempts:
             raise RuntimeError(
-                f"Unable to sample {point_count} points inside {envelope.name} border."
+                f"Unable to sample {point_count} points inside "
+                f"{envelope.name}"
+                f"{(' — ' + region_trim) if region_trim else ''}."
             )
 
         lat = rng.uniform(lat_min, lat_max)
         lon = rng.uniform(lon_min, lon_max)
         if not _point_in_any_polygon(lat, lon, polygons):
+            continue
+        if region_polys and not nuts_geo.point_in_any_region_polygon(
+            lat, lon, region_polys
+        ):
             continue
 
         index = len(points)
@@ -224,6 +287,7 @@ def generate_candidate_points(
                 country=envelope.name,
                 lat=round(lat, 6),
                 lon=round(lon, 6),
+                region=point_region,
             )
         )
     return points

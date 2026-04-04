@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgroSite</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --soil:       #2C2416;
+      --soil-mid:   #4A3B28;
+      --bark:       #6B5240;
+      --moss:       #3D5C2E;
+      --leaf:       #5A8A40;
+      --sprout:     #8BBE6A;
+      --canopy:     #B8D89A;
+      --mist:       #EAF2E0;
+      --parchment:  #F7F3EC;
+      --cream:      #FDFAF5;
+      --amber:      #C8860A;
+      --amber-lt:   #F5E4C0;
+      --text:       #1E1A14;
+      --text-mid:   #4A4236;
+      --text-soft:  #8A7E6E;
+      --text-hint:  #B8AFA0;
+      --border:     rgba(74,59,40,0.12);
+      --border-md:  rgba(74,59,40,0.22);
+      --r-sm: 6px;
+      --r-md: 10px;
+      --r-lg: 16px;
+      --r-xl: 24px;
+    }
+
+    html { font-size: 15px; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--parchment);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 230px; min-width: 230px;
+      background: var(--soil);
+      display: flex; flex-direction: column;
+      position: sticky; top: 0; height: 100vh;
+      overflow: hidden;
+    }
+
+    .sidebar-grain {
+      position: absolute; inset: 0; pointer-events: none; z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+    }
+
+    .sidebar > * { position: relative; z-index: 1; }
+
+    .logo-area {
+      padding: 28px 22px 20px;
+      border-bottom: 0.5px solid rgba(255,255,255,0.08);
+    }
+    .logo-mark {
+      width: 40px; height: 40px;
+      background: var(--leaf);
+      border-radius: var(--r-md);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 14px;
+    }
+    .logo-mark svg { width: 22px; height: 22px; }
+    .logo-name {
+      font-family: 'DM Serif Display', serif;
+      font-size: 20px; color: var(--cream);
+      letter-spacing: -0.3px;
+      line-height: 1;
+    }
+    .logo-tagline {
+      font-size: 11px; color: rgba(255,255,255,0.38);
+      margin-top: 4px; letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .nav { padding: 18px 12px; flex: 1; }
+    .nav-section { margin-bottom: 20px; }
+    .nav-label {
+      font-size: 10px; color: rgba(255,255,255,0.25);
+      text-transform: uppercase; letter-spacing: 0.1em;
+      padding: 0 10px; margin-bottom: 4px;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 10px; border-radius: var(--r-sm);
+      font-size: 13px; color: rgba(255,255,255,0.5);
+      cursor: pointer; transition: all 0.15s;
+      font-weight: 400;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.8); }
+    .nav-item.active {
+      background: rgba(90,138,64,0.25);
+      color: var(--canopy); font-weight: 500;
+    }
+    .nav-item svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+    .nav-footer {
+      padding: 16px 22px;
+      border-top: 0.5px solid rgba(255,255,255,0.08);
+      font-size: 11px; color: rgba(255,255,255,0.22);
+    }
+
+    /* ── Main ── */
+    .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+    .topbar {
+      background: var(--cream);
+      border-bottom: 0.5px solid var(--border);
+      padding: 18px 36px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 20;
+    }
+    .topbar-left { display: flex; align-items: baseline; gap: 14px; }
+    .page-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 22px; color: var(--text);
+      letter-spacing: -0.4px;
+    }
+    .breadcrumb {
+      font-size: 12px; color: var(--text-hint);
+    }
+    .topbar-right { display: flex; align-items: center; gap: 10px; }
+
+    .status-pill {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 12px; border-radius: 99px;
+      font-size: 12px; font-weight: 500;
+      border: 0.5px solid var(--border-md);
+      color: var(--text-soft); background: var(--parchment);
+    }
+    .status-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--sprout);
+    }
+    .status-dot.busy { background: var(--amber); animation: pulse 1.2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    .btn-primary {
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 20px; border-radius: var(--r-md);
+      background: var(--moss); color: var(--mist);
+      border: none; cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px; font-weight: 600;
+      letter-spacing: 0.01em;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .btn-primary:hover { background: var(--leaf); }
+    .btn-primary:active { transform: scale(0.97); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary svg { width: 13px; height: 13px; }
+
+    /* ── Content grid ── */
+    .content {
+      padding: 28px 36px;
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      grid-template-rows: auto auto 1fr;
+      gap: 20px;
+      align-content: start;
+      flex: 1;
+    }
+
+    .panel-inputs { grid-column: 1; grid-row: 1 / 4; display: flex; flex-direction: column; gap: 16px; }
+    .panel-results { grid-column: 2; grid-row: 1 / 4; display: flex; flex-direction: column; gap: 16px; }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--cream);
+      border: 0.5px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 22px 24px;
+      animation: fadeUp 0.3s ease both;
+    }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .card:nth-child(2) { animation-delay: 0.05s; }
+    .card:nth-child(3) { animation-delay: 0.10s; }
+    .card:nth-child(4) { animation-delay: 0.15s; }
+
+    .card-head {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 18px;
+    }
+    .card-icon {
+      width: 28px; height: 28px; border-radius: var(--r-sm);
+      background: var(--mist); border: 0.5px solid var(--border);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .card-icon svg { width: 13px; height: 13px; stroke: var(--leaf); }
+    .card-title {
+      font-size: 12px; font-weight: 600; color: var(--text-mid);
+      text-transform: uppercase; letter-spacing: 0.07em;
+    }
+
+    /* ── Form fields ── */
+    .field { margin-bottom: 16px; }
+    .field:last-child { margin-bottom: 0; }
+    .field-label {
+      font-size: 12px; color: var(--text-soft); font-weight: 500;
+      display: block; margin-bottom: 6px;
+    }
+
+    select, input[type="number"], input[type="text"] {
+      width: 100%;
+      padding: 9px 12px;
+      font-size: 13px; font-family: 'DM Sans', sans-serif;
+      border: 0.5px solid var(--border-md);
+      border-radius: var(--r-md);
+      background: var(--parchment); color: var(--text);
+      appearance: none; outline: none;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    select:focus, input:focus { border-color: var(--leaf); background: var(--cream); }
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238A7E6E' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 11px center; padding-right: 30px;
+    }
+
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    /* ── Slider ── */
+    .slider-wrap { display: flex; align-items: center; gap: 12px; }
+    .slider-wrap input[type="range"] {
+      flex: 1; height: 4px; padding: 0; border: none; background: none;
+      accent-color: var(--leaf);
+    }
+    .slider-num {
+      font-size: 13px; font-weight: 600; color: var(--text);
+      min-width: 36px; text-align: right;
+      background: var(--mist); border: 0.5px solid var(--border);
+      border-radius: var(--r-sm); padding: 3px 8px;
+    }
+
+    /* ── Run mode ── */
+    .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .mode-card {
+      border: 0.5px solid var(--border-md);
+      border-radius: var(--r-md);
+      padding: 14px 16px; cursor: pointer;
+      transition: all 0.15s; position: relative;
+      background: var(--parchment);
+    }
+    .mode-card:hover { border-color: var(--sprout); background: var(--cream); }
+    .mode-card.active { border-color: var(--leaf); background: var(--mist); }
+    .mode-card.active .mode-name { color: var(--moss); }
+    .mode-indicator {
+      width: 14px; height: 14px; border-radius: 50%;
+      border: 1.5px solid var(--border-md);
+      margin-bottom: 10px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+    }
+    .mode-card.active .mode-indicator {
+      border-color: var(--leaf); background: var(--leaf);
+    }
+    .mode-dot { width: 6px; height: 6px; border-radius: 50%; background: white; }
+    .mode-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+    .mode-desc { font-size: 11px; color: var(--text-soft); line-height: 1.45; }
+    .mode-badge {
+      display: inline-flex; align-items: center; gap: 3px;
+      font-size: 10px; background: var(--amber-lt); color: var(--amber);
+      padding: 2px 7px; border-radius: 99px; font-weight: 600;
+      margin-top: 6px;
+    }
+
+    /* ── Toggles ── */
+    .toggle-list {}
+    .toggle-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 0;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .toggle-item:first-child { padding-top: 0; }
+    .toggle-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .toggle-btn {
+      width: 36px; height: 20px; border-radius: 99px;
+      background: var(--border-md); position: relative;
+      cursor: pointer; flex-shrink: 0;
+      border: none; transition: background 0.2s;
+    }
+    .toggle-btn.on { background: var(--leaf); }
+    .toggle-knob {
+      width: 16px; height: 16px; border-radius: 50%; background: white;
+      position: absolute; top: 2px; left: 2px; transition: left 0.2s;
+      pointer-events: none;
+    }
+    .toggle-btn.on .toggle-knob { left: 18px; }
+    .toggle-text { flex: 1; }
+    .toggle-label { font-size: 13px; color: var(--text); font-weight: 400; }
+    .toggle-sub { font-size: 11px; color: var(--text-hint); margin-top: 1px; }
+
+    /* ── Results panel ── */
+    .results-empty {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 60px 30px;
+      background: var(--cream);
+      border: 0.5px solid var(--border);
+      border-radius: var(--r-lg);
+      border-style: dashed;
+    }
+    .empty-art { margin-bottom: 20px; opacity: 0.4; }
+    .empty-art svg { width: 52px; height: 52px; stroke: var(--bark); }
+    .empty-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 18px; color: var(--text-mid); margin-bottom: 6px;
+    }
+    .empty-sub { font-size: 13px; color: var(--text-hint); line-height: 1.6; max-width: 260px; }
+
+    .results-loading {
+      flex: 1; display: none; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 60px 30px;
+      background: var(--cream);
+      border: 0.5px solid var(--border);
+      border-radius: var(--r-lg);
+    }
+    .loader-ring {
+      width: 40px; height: 40px; border-radius: 50%;
+      border: 2px solid var(--border);
+      border-top-color: var(--leaf);
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loader-text { font-size: 13px; color: var(--text-soft); }
+
+    .results-content { display: none; flex-direction: column; gap: 16px; }
+
+    /* stat strip */
+    .stat-strip {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    .stat-box {
+      background: var(--cream);
+      border: 0.5px solid var(--border);
+      border-radius: var(--r-md);
+      padding: 14px 16px;
+    }
+    .stat-lbl { font-size: 11px; color: var(--text-soft); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+    .stat-num { font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--text); line-height: 1; }
+    .stat-unit { font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text-soft); font-weight: 400; }
+
+    /* results table */
+    .results-card {
+      background: var(--cream);
+      border: 0.5px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 22px 24px;
+    }
+    .results-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .results-table th {
+      text-align: left; font-size: 11px; font-weight: 600; color: var(--text-soft);
+      text-transform: uppercase; letter-spacing: 0.06em;
+      padding: 0 12px 10px 0; border-bottom: 0.5px solid var(--border);
+    }
+    .results-table th.sortable {
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.15s ease;
+    }
+    .results-table th.sortable:hover { color: var(--text-mid); }
+    .results-table th.sortable.sorted { color: var(--moss); }
+    .results-table th.sortable.sorted--asc::after,
+    .results-table th.sortable.sorted--desc::after {
+      content: '';
+      display: inline-block;
+      margin-left: 4px;
+      width: 0;
+      height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      vertical-align: middle;
+    }
+    .results-table th.sortable.sorted--asc::after {
+      border-bottom: 5px solid currentColor;
+      border-top: 0;
+    }
+    .results-table th.sortable.sorted--desc::after {
+      border-top: 5px solid currentColor;
+      border-bottom: 0;
+    }
+    .results-table td {
+      padding: 11px 12px 11px 0;
+      border-bottom: 0.5px solid var(--border);
+      color: var(--text); vertical-align: middle;
+    }
+    .results-table tr:last-child td { border-bottom: none; }
+
+    .rank-num {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: var(--mist); border: 0.5px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 600; color: var(--text-mid);
+    }
+    .rank-num.top { background: var(--amber-lt); color: var(--amber); border-color: rgba(200,134,10,0.25); }
+
+    .coord { font-size: 12px; color: var(--text-mid); font-family: 'Courier New', monospace; }
+
+    .score-cell { display: flex; align-items: center; gap: 8px; }
+    .bar-track { width: 72px; height: 4px; background: var(--mist); border-radius: 99px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 99px; background: var(--leaf); }
+    .score-pct { font-size: 12px; font-weight: 600; color: var(--moss); }
+
+    /* AI insight */
+    .ai-card {
+      background: var(--cream);
+      border: 0.5px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 20px 24px;
+    }
+    .ai-label {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 600; color: var(--moss);
+      text-transform: uppercase; letter-spacing: 0.07em;
+      margin-bottom: 10px;
+    }
+    .ai-label svg { width: 12px; height: 12px; }
+    .ai-text {
+      font-size: 13px; color: var(--text-mid); line-height: 1.75;
+      padding-left: 14px; border-left: 2px solid var(--sprout);
+      white-space: pre-line;
+    }
+    .ai-text.placeholder { color: var(--text-hint); font-style: italic; }
+
+    .result-map-wrap {
+      background: var(--cream);
+      border: 0.5px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 20px 24px;
+      margin-top: 16px;
+    }
+    .result-map {
+      height: min(72vh, 720px);
+      min-height: 480px;
+      border-radius: var(--r-md);
+      overflow: hidden;
+      border: 0.5px solid var(--border);
+      background: var(--mist);
+    }
+  </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-grain"></div>
+
+  <div class="logo-area">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#B8D89A" stroke-width="1.8">
+        <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2"/>
+        <path d="M12 6v6l4 2"/>
+        <path d="M6 12c0-3.3 2.7-6 6-6"/>
+      </svg>
+    </div>
+    <div class="logo-name">AgroSite</div>
+    <div class="logo-tagline">Crop site optimizer</div>
+  </div>
+
+  <nav class="nav">
+    <div class="nav-section">
+      <div class="nav-label">Analysis</div>
+      <div class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Site analysis
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><path d="M7 16l4-4 4 4 4-6"/></svg>
+        Historical runs
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
+        Region map
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Settings</div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+        Preferences
+      </div>
+    </div>
+  </nav>
+
+  <div class="nav-footer">v0.1.0 — Europe only</div>
+</aside>
+
+<!-- Main -->
+<div class="main">
+  <header class="topbar">
+    <div class="topbar-left">
+      <h1 class="page-title">Site analysis</h1>
+      <span class="breadcrumb">Europe / Romania</span>
+    </div>
+    <div class="topbar-right">
+      <div class="status-pill" id="status-pill">
+        <div class="status-dot" id="status-dot"></div>
+        <span id="status-text">Ready</span>
+      </div>
+      <button class="btn-primary" id="run-btn" onclick="handleRun()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3" fill="currentColor"/></svg>
+        Run analysis
+      </button>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- Left: inputs -->
+    <div class="panel-inputs">
+
+      <!-- Location & crop -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <span class="card-title">Location & crop</span>
+        </div>
+        <div class="field">
+          <label class="field-label">Country</label>
+          <select id="country">
+            <option>France</option>
+            <option>Germany</option>
+            <option selected>Romania</option>
+            <option>Italy</option>
+            <option>Spain</option>
+            <option>Poland</option>
+            <option>Netherlands</option>
+            <option>Hungary</option>
+            <option>Bulgaria</option>
+            <option>Czech Republic</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="field-label">Region (NUTS)</label>
+          <select id="region">
+            <option value="">Whole country</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="field-label">Crop type</label>
+          <select id="crop">
+            <option>Wheat</option>
+            <option selected>Corn</option>
+            <option>Sunflower</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Sampling parameters -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+          </div>
+          <span class="card-title">Sampling parameters</span>
+        </div>
+        <div class="field">
+          <label class="field-label">Candidate points</label>
+          <div class="slider-wrap">
+            <input type="range" min="10" max="500" value="120" step="1"
+                   oninput="document.getElementById('pts-val').textContent=Math.round(this.value)">
+            <span class="slider-num" id="pts-val">120</span>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">Top results to return</label>
+          <div class="slider-wrap">
+            <input type="range" min="1" max="20" value="5" step="1"
+                   oninput="document.getElementById('top-val').textContent=Math.round(this.value)">
+            <span class="slider-num" id="top-val">5</span>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">Random seed</label>
+          <input type="number" id="seed" value="42">
+        </div>
+      </div>
+
+      <!-- Run mode -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </div>
+          <span class="card-title">Run mode</span>
+        </div>
+        <div class="mode-grid">
+          <div class="mode-card active" onclick="selectMode(this)">
+            <div class="mode-indicator"><div class="mode-dot"></div></div>
+            <div class="mode-name">Safe demo</div>
+            <div class="mode-desc">Cached data, no live API calls made</div>
+            <div class="mode-badge">
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Safe
+            </div>
+          </div>
+          <div class="mode-card" onclick="selectMode(this)">
+            <div class="mode-indicator"></div>
+            <div class="mode-name">Live run</div>
+            <div class="mode-desc">Fetches real weather & soil data from APIs</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Thinking engine -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><circle cx="12" cy="17" r="0.5" fill="currentColor"/><circle cx="12" cy="12" r="10"/></svg>
+          </div>
+          <span class="card-title">Thinking engine</span>
+        </div>
+        <div class="toggle-list">
+          <div class="toggle-item">
+            <button class="toggle-btn on" onclick="this.classList.toggle('on')">
+              <div class="toggle-knob"></div>
+            </button>
+            <div class="toggle-text">
+              <div class="toggle-label">AI recommendations</div>
+              <div class="toggle-sub">Claude explains why each site ranks</div>
+            </div>
+          </div>
+          <div class="toggle-item">
+            <button class="toggle-btn on" onclick="this.classList.toggle('on')">
+              <div class="toggle-knob"></div>
+            </button>
+            <div class="toggle-text">
+              <div class="toggle-label">Risk analysis</div>
+              <div class="toggle-sub">Frost, drought & flood risk per site</div>
+            </div>
+          </div>
+          <div class="toggle-item">
+            <button class="toggle-btn" onclick="this.classList.toggle('on')">
+              <div class="toggle-knob"></div>
+            </button>
+            <div class="toggle-text">
+              <div class="toggle-label">Extended reasoning</div>
+              <div class="toggle-sub">Slower, more detailed AI output</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right: results -->
+    <div class="panel-results">
+
+      <!-- Empty state -->
+      <div class="results-empty" id="results-empty">
+        <div class="empty-art">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <path d="M9 22V12h6v10"/>
+          </svg>
+        </div>
+        <div class="empty-title">No results yet</div>
+        <div class="empty-sub">Configure your parameters and run the analysis to find optimal crop sites.</div>
+      </div>
+
+      <!-- Loading -->
+      <div class="results-loading" id="results-loading">
+        <div class="loader-ring"></div>
+        <div class="loader-text">Sampling candidate points across <span id="loading-country">Romania</span>…</div>
+      </div>
+
+      <!-- Results -->
+      <div class="results-content" id="results-content">
+
+        <div class="stat-strip">
+          <div class="stat-box">
+            <div class="stat-lbl">Points sampled</div>
+            <div class="stat-num" id="stat-sampled">—</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-lbl">Returned</div>
+            <div class="stat-num" id="stat-returned">—</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-lbl">Top score</div>
+            <div class="stat-num" id="stat-top">—<span class="stat-unit"></span></div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-lbl">Seed used</div>
+            <div class="stat-num" id="stat-seed">—</div>
+          </div>
+        </div>
+
+        <div class="results-card">
+          <div class="card-head" style="margin-bottom:14px;">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+            </div>
+            <span class="card-title" id="results-title">Top sites</span>
+          </div>
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th style="width:36px;" class="sortable" data-sort="rank" tabindex="0" role="columnheader" aria-sort="none">#</th>
+                <th class="sortable" data-sort="coord" tabindex="0" role="columnheader" aria-sort="none">Coordinates</th>
+                <th class="sortable" data-sort="ph" tabindex="0" role="columnheader" aria-sort="none">pH</th>
+                <th class="sortable" data-sort="temp" tabindex="0" role="columnheader" aria-sort="none">Avg temp</th>
+                <th class="sortable" data-sort="rain" tabindex="0" role="columnheader" aria-sort="none">Rainfall</th>
+                <th class="sortable" data-sort="score" tabindex="0" role="columnheader" aria-sort="none">Score</th>
+              </tr>
+            </thead>
+            <tbody id="results-tbody">
+              <!-- filled by JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="ai-card">
+          <div class="ai-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+            AI insight
+          </div>
+          <div class="ai-text placeholder" id="ai-text">
+            AI insights will appear here after the analysis runs with the thinking engine enabled.
+          </div>
+        </div>
+
+        <div class="result-map-wrap" id="result-map-wrap" style="display:none;" aria-hidden="true">
+          <div class="ai-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+            Top sites map
+          </div>
+          <div id="result-map" class="result-map" role="img" aria-label="Map of ranked candidate sites"></div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+  function updateBreadcrumb() {
+    const country = document.getElementById('country').value;
+    document.querySelector('.breadcrumb').textContent = 'Europe / ' + country;
+  }
+
+  function selectMode(el) {
+    document.querySelectorAll('.mode-card').forEach(c => {
+      c.classList.remove('active');
+      c.querySelector('.mode-indicator').innerHTML = '';
+    });
+    el.classList.add('active');
+    el.querySelector('.mode-indicator').innerHTML = '<div class="mode-dot"></div>';
+  }
+
+  function handleRun() {
+    const btn = document.getElementById('run-btn');
+    const dot = document.getElementById('status-dot');
+    const statusText = document.getElementById('status-text');
+    const country = document.getElementById('country').value;
+
+    btn.disabled = true;
+    dot.className = 'status-dot busy';
+    statusText.textContent = 'Running…';
+
+    document.getElementById('results-empty').style.display = 'none';
+    document.getElementById('results-loading').style.display = 'flex';
+    document.getElementById('results-content').style.display = 'none';
+    document.getElementById('loading-country').textContent = country;
+
+    // Simulate async — replace this with your real fetch('/run', ...) call
+    setTimeout(() => {
+      showDemoResults();
+      btn.disabled = false;
+      dot.className = 'status-dot';
+      statusText.textContent = 'Ready';
+      document.getElementById('results-loading').style.display = 'none';
+      document.getElementById('results-content').style.display = 'flex';
+    }, 1800);
+  }
+
+  function showDemoResults() {
+    const crop = document.getElementById('crop').value;
+    const country = document.getElementById('country').value;
+    const pts = document.getElementById('pts-val').textContent;
+    const topN = document.getElementById('top-val').textContent;
+    const seed = document.getElementById('seed').value;
+
+    document.getElementById('stat-sampled').textContent = pts;
+    document.getElementById('stat-returned').textContent = topN;
+    document.getElementById('stat-top').innerHTML = '—<span class="stat-unit"> %</span>';
+    document.getElementById('stat-seed').textContent = seed;
+    document.getElementById('results-title').textContent = `Top sites — ${crop} in ${country}`;
+
+    // Placeholder rows — replace with real data from your backend
+    const rows = [
+      { rank: 1, lat: '44.2134', lon: '26.0912', ph: '6.8', temp: '12.4°C', rain: '540 mm', score: null },
+      { rank: 2, lat: '45.6301', lon: '27.4481', ph: '7.1', temp: '11.8°C', rain: '510 mm', score: null },
+      { rank: 3, lat: '43.8712', lon: '25.3156', ph: '6.5', temp: '13.1°C', rain: '480 mm', score: null },
+    ];
+
+    document.getElementById('results-tbody').innerHTML = rows.map(r => `
+      <tr>
+        <td><div class="rank-num ${r.rank === 1 ? 'top' : ''}">${r.rank}</div></td>
+        <td><span class="coord">${r.lat}°N, ${r.lon}°E</span></td>
+        <td>${r.ph}</td>
+        <td>${r.temp}</td>
+        <td>${r.rain}</td>
+        <td>
+          <div class="score-cell">
+            <div class="bar-track"><div class="bar-fill" style="width:0%"></div></div>
+            <span class="score-pct">—</span>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+
+    document.getElementById('ai-text').className = 'ai-text placeholder';
+    document.getElementById('ai-text').textContent =
+      'Connect your backend and enable AI recommendations to see agronomic insights here.';
+  }
+</script>
+</body>
+</html>

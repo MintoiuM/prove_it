@@ -1,0 +1,4 @@
+clay_pct,country,frost_risk,humidity_pct,lat,lon,mean_temp_c,nuts_region,point_id,rainfall_mm,soil_error,soil_ok,soil_organic_carbon_gkg,soil_ph,temp_std_c,weather_error,weather_ok,weather_stress_ratio,wind_speed_10m_kmh
+24.7,Germany,0.0,58.217,48.309268,11.522182,8.768,Bayern,P001,151.11,,True,20.126,6.31,4.371,,True,0.0,10.592
+26.0,Germany,0.0,57.833,50.063746,10.667887,8.805,Bayern,P002,208.05,,True,17.748,6.67,3.925,,True,0.0,10.221
+26.0,Germany,0.0,57.217,49.605212,10.562054,8.859,Bayern,P003,71.905,,True,17.748,6.67,4.069,,True,0.0,10.329

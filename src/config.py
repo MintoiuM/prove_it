@@ -50,9 +50,42 @@ def _default_date_range() -> tuple[str, str]:
     return start.isoformat(), end.isoformat()
 
 
+def _resolve_soil_dataset_csv_path() -> Path | None:
+    """Use europe_soil_climate_dataset.csv when present unless SOIL_DATASET_CSV disables it."""
+    raw = os.getenv("SOIL_DATASET_CSV")
+    if raw is not None:
+        stripped = raw.strip()
+        if not stripped or stripped.lower() in (
+            "none",
+            "off",
+            "0",
+            "false",
+            "soilgrids",
+        ):
+            return None
+        candidate = Path(stripped)
+        return candidate.resolve() if candidate.is_file() else None
+    candidate = Path("europe_soil_climate_dataset.csv")
+    return candidate.resolve() if candidate.is_file() else None
+
+
+def resolve_nuts2_yields_csv_path() -> Path | None:
+    """Eurostat-style regional yields CSV (optional)."""
+    raw = os.getenv("NUTS2_YIELDS_CSV")
+    if raw is not None:
+        stripped = raw.strip()
+        if not stripped or stripped.lower() in ("none", "off", "0", "false"):
+            return None
+        candidate = Path(stripped)
+        return candidate.resolve() if candidate.is_file() else None
+    candidate = Path("nuts2_crop_yields_all_regions.csv")
+    return candidate.resolve() if candidate.is_file() else None
+
+
 @dataclass(frozen=True)
 class Settings:
     weather_endpoint: str
+    weather_backend: str
     soil_endpoint: str
     request_timeout_seconds: float
     request_retries: int
@@ -73,16 +106,39 @@ class Settings:
     ollama_model: str
     llm_timeout_seconds: float
     llm_max_points: int
+    google_maps_api_key: str | None
+    llm_provider: str
+    gemini_api_key: str | None
+    gemini_model: str
+    soil_dataset_csv_path: Path | None
 
     @classmethod
     def from_env(cls) -> "Settings":
         # Reload .env on each read so web app picks up edits without restart.
         _load_dotenv_if_present(override=True)
         default_start, default_end = _default_date_range()
+        _gemini_raw = os.getenv("GEMINI_API_KEY", "").strip()
+        gemini_api_key = _gemini_raw if _gemini_raw else None
+        _llm_explicit = os.getenv("LLM_PROVIDER", "").strip().lower()
+        if _llm_explicit in ("ollama", "gemini"):
+            llm_provider = _llm_explicit
+        else:
+            llm_provider = "gemini" if gemini_api_key else "ollama"
+        _maps_raw = os.getenv("GOOGLE_MAPS_API_KEY", "").strip()
+        google_maps_api_key = _maps_raw if _maps_raw else None
+        _force_open_meteo = (
+            os.getenv("WEATHER_PROVIDER", "").strip().lower() == "open_meteo"
+        )
+        weather_backend = (
+            "open_meteo"
+            if _force_open_meteo or not google_maps_api_key
+            else "google_forecast"
+        )
         return cls(
             weather_endpoint=os.getenv(
                 "WEATHER_ENDPOINT", "https://archive-api.open-meteo.com/v1/archive"
             ),
+            weather_backend=weather_backend,
             soil_endpoint=os.getenv(
                 "SOIL_ENDPOINT",
                 "https://rest.isric.org/soilgrids/v2.0/properties/query",
@@ -110,5 +166,11 @@ class Settings:
             ollama_model=os.getenv("OLLAMA_MODEL", "llama3"),
             llm_timeout_seconds=_env_float("LLM_TIMEOUT_SECONDS", 20.0),
             llm_max_points=_env_int("LLM_MAX_POINTS", 25),
+            google_maps_api_key=google_maps_api_key,
+            llm_provider=llm_provider,
+            gemini_api_key=gemini_api_key,
+            gemini_model=os.getenv("GEMINI_MODEL", "gemini-2.5-flash").strip()
+            or "gemini-2.5-flash",
+            soil_dataset_csv_path=_resolve_soil_dataset_csv_path(),
         )
 

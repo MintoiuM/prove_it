@@ -1,0 +1,133 @@
+{
+  "run_id": "run_20260404T214511Z_b9cb05",
+  "country": "Germany",
+  "crop": "Barley",
+  "ranking_engine": "rules",
+  "best_point": {
+    "point_id": "P001",
+    "country": "Germany",
+    "lat": 48.309268,
+    "lon": 11.522182,
+    "weather_ok": true,
+    "soil_ok": true,
+    "weather_error": null,
+    "soil_error": null,
+    "mean_temp_c": 8.768,
+    "temp_std_c": 4.371,
+    "frost_risk": 0.0,
+    "rainfall_mm": 151.11,
+    "humidity_pct": 58.217,
+    "wind_speed_10m_kmh": 10.592,
+    "weather_stress_ratio": 0.0,
+    "soil_ph": 6.31,
+    "clay_pct": 24.7,
+    "soil_organic_carbon_gkg": 20.126,
+    "nuts_region": "Bayern",
+    "score": 63.276,
+    "score_band": "good",
+    "confidence": 0.817,
+    "missing_features": [
+      "soil_moisture_1_3cm",
+      "sand_pct",
+      "et0_mm"
+    ],
+    "hard_violations": [
+      "mean_temp_c"
+    ],
+    "rules_reasoning": "Best-ranked site P001 for Barley scores 63.3% (good), based on matching weather and soil signals to crop-specific ideal and limit ranges. Confidence reflects how many inputs were present (about 82% here).\n\nWhat looks strong: Relative humidity (58.2%) is within the ideal band (47.28\u201371.28) for Barley. Frost exposure (0.0% of hours at or below freezing) is within the ideal band (0\u20130.5) for Barley. Rainfall (151 mm (annualized)) is within the ideal band (150\u20131400) for Barley. Soil pH (6.31) is within the ideal band (5\u20138.5) for Barley. Soil organic carbon (20.1 g/kg) is within the ideal band (4\u201350) for Barley. Wind speed (10.6 km/h) is within the ideal band (0\u201340) for Barley. Severe-weather stress (0.0% of hours with severe weather codes) is within the ideal band (0\u20130.35) for Barley.\n\nWhat is acceptable but not ideal: Clay content is 24.7%, above the ideal range (0\u201324) but still inside acceptable bounds (0\u2013100), which can add stress or management needs.\n\nWhat works against the site: Mean temperature is 8.8 \u00b0C, outside the viable range (12.18\u201348) for Barley (ideal 25.18\u201335.18). This heavily penalizes suitability.\n\nData limitations: no values for Surface soil moisture, Sand content, Reference evapotranspiration (ET0). Those gaps reduce confidence and apply a scoring penalty."
+  },
+  "top_candidates": [
+    {
+      "point_id": "P001",
+      "country": "Germany",
+      "lat": 48.309268,
+      "lon": 11.522182,
+      "weather_ok": true,
+      "soil_ok": true,
+      "weather_error": null,
+      "soil_error": null,
+      "mean_temp_c": 8.768,
+      "temp_std_c": 4.371,
+      "frost_risk": 0.0,
+      "rainfall_mm": 151.11,
+      "humidity_pct": 58.217,
+      "wind_speed_10m_kmh": 10.592,
+      "weather_stress_ratio": 0.0,
+      "soil_ph": 6.31,
+      "clay_pct": 24.7,
+      "soil_organic_carbon_gkg": 20.126,
+      "nuts_region": "Bayern",
+      "score": 63.276,
+      "score_band": "good",
+      "confidence": 0.817,
+      "missing_features": [
+        "soil_moisture_1_3cm",
+        "sand_pct",
+        "et0_mm"
+      ],
+      "hard_violations": [
+        "mean_temp_c"
+      ],
+      "rules_reasoning": "Best-ranked site P001 for Barley scores 63.3% (good), based on matching weather and soil signals to crop-specific ideal and limit ranges. Confidence reflects how many inputs were present (about 82% here).\n\nWhat looks strong: Relative humidity (58.2%) is within the ideal band (47.28\u201371.28) for Barley. Frost exposure (0.0% of hours at or below freezing) is within the ideal band (0\u20130.5) for Barley. Rainfall (151 mm (annualized)) is within the ideal band (150\u20131400) for Barley. Soil pH (6.31) is within the ideal band (5\u20138.5) for Barley. Soil organic carbon (20.1 g/kg) is within the ideal band (4\u201350) for Barley. Wind speed (10.6 km/h) is within the ideal band (0\u201340) for Barley. Severe-weather stress (0.0% of hours with severe weather codes) is within the ideal band (0\u20130.35) for Barley.\n\nWhat is acceptable but not ideal: Clay content is 24.7%, above the ideal range (0\u201324) but still inside acceptable bounds (0\u2013100), which can add stress or management needs.\n\nWhat works against the site: Mean temperature is 8.8 \u00b0C, outside the viable range (12.18\u201348) for Barley (ideal 25.18\u201335.18). This heavily penalizes suitability.\n\nData limitations: no values for Surface soil moisture, Sand content, Reference evapotranspiration (ET0). Those gaps reduce confidence and apply a scoring penalty."
+    },
+    {
+      "point_id": "P002",
+      "country": "Germany",
+      "lat": 50.063746,
+      "lon": 10.667887,
+      "weather_ok": true,
+      "soil_ok": true,
+      "weather_error": null,
+      "soil_error": null,
+      "mean_temp_c": 8.805,
+      "temp_std_c": 3.925,
+      "frost_risk": 0.0,
+      "rainfall_mm": 208.05,
+      "humidity_pct": 57.833,
+      "wind_speed_10m_kmh": 10.221,
+      "weather_stress_ratio": 0.0,
+      "soil_ph": 6.67,
+      "clay_pct": 26.0,
+      "soil_organic_carbon_gkg": 17.748,
+      "nuts_region": "Bayern",
+      "score": 63.077,
+      "score_band": "good",
+      "confidence": 0.817,
+      "missing_features": [
+        "soil_moisture_1_3cm",
+        "sand_pct",
+        "et0_mm"
+      ],
+      "hard_violations": [
+        "mean_temp_c"
+      ]
+    }
+  ],
+  "operational_area": {
+    "center_lat": 48.309268,
+    "center_lon": 11.522182,
+    "radius_km": 100.0,
+    "geometry_type": "circle"
+  },
+  "summary": {
+    "total_points": 3,
+    "successful_weather_fetches": 3,
+    "successful_soil_fetches": 3,
+    "points_scored_fully": 3,
+    "points_scored_partially": 3,
+    "elapsed_seconds": {
+      "collect_features": 20.362,
+      "score_and_rank": 0.0
+    },
+    "ranking_engine": "rules",
+    "risk_analysis_enabled": false,
+    "extended_reasoning_enabled": false,
+    "region": "Bayern",
+    "nuts2_yield_tons_ha": null,
+    "nuts2_yield_year": null,
+    "nuts2_yield_score": null,
+    "nuts2_yield_applied": false,
+    "nuts2_crop_in_file": false
+  },
+  "score_explanation": "Score combines weather and soil fit against crop-specific ideal ranges, then applies calibrated penalties for missing features and hard-threshold violations. Score bands: poor (<40), fair (40-59), good (60-79), excellent (80-100)."
+}

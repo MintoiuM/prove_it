@@ -1,0 +1,451 @@
+Country,Region,Latitude,Longitude,Soil_Type,pH,Clay_Percent,Organic_Matter_Percent
+Bulgaria,Danubian Plain,43.6193,25.1865,Chernozem,6.8,31.2,3.62
+Bulgaria,Danubian Plain,43.254,24.8601,Chernozem,7.01,35.3,4.27
+Bulgaria,Danubian Plain,43.4978,24.999,Chernozem,6.85,36.2,3.74
+Bulgaria,Danubian Plain,43.8355,24.5798,Chernozem,6.9,33.4,4.05
+Bulgaria,Danubian Plain,43.672,24.7466,Chernozem,6.76,33.7,4.06
+Bulgaria,Danubian Plain,43.2729,25.1338,Chernozem,6.82,31.8,3.6
+Bulgaria,Danubian Plain,43.6363,25.2689,Chernozem,7.39,32.3,4.03
+Bulgaria,Danubian Plain,43.4643,25.0405,Chernozem,6.95,35.1,4.31
+Bulgaria,Danubian Plain,43.669,25.1064,Chernozem,7.01,31.2,3.88
+Bulgaria,Danubian Plain,43.4634,24.7076,Chernozem,6.86,37.7,4.26
+Bulgaria,Danubian Plain,43.3871,24.6392,Chernozem,7.12,31.9,3.53
+Bulgaria,Danubian Plain,43.8073,25.2038,Chernozem,7.01,33.6,3.96
+Bulgaria,Danubian Plain,43.6444,25.3782,Chernozem,7.07,30.4,3.73
+Bulgaria,Danubian Plain,43.1823,25.1768,Chernozem,6.66,31.6,3.67
+Bulgaria,Danubian Plain,43.8316,25.313,Chernozem,6.77,31.6,4.39
+Bulgaria,Danubian Plain,43.2288,25.168,Chernozem,6.81,35.1,4.01
+Bulgaria,Danubian Plain,43.7383,25.1364,Chernozem,7.31,31.8,4.02
+Bulgaria,Danubian Plain,43.9565,24.7436,Chernozem,7.25,32.8,4.33
+Bulgaria,Danubian Plain,43.507,25.3249,Chernozem,7.25,31.5,3.79
+Bulgaria,Danubian Plain,43.7945,24.682,Chernozem,6.99,34.6,3.82
+Bulgaria,Danubian Plain,43.6015,24.9373,Chernozem,7.35,35.8,4.32
+Bulgaria,Danubian Plain,43.6371,25.4514,Chernozem,6.88,34.7,3.5
+Bulgaria,Danubian Plain,43.3815,25.4157,Chernozem,7.31,31.7,4.08
+Bulgaria,Danubian Plain,43.7353,24.5398,Chernozem,6.97,32.6,4.08
+Bulgaria,Danubian Plain,43.2932,25.0815,Chernozem,7.04,31.1,3.75
+France,Nouvelle-Aquitaine,44.6735,-0.2908,Luvisols,6.7,21.5,2.58
+France,Occitanie,43.0459,1.6976,Cambisols,7.49,31.1,2.53
+France,Centre-Val de Loire,47.5851,1.8858,Calcisols,7.92,19.5,2.95
+France,Nouvelle-Aquitaine,45.4653,0.35,Luvisols,6.9,23.6,2.22
+France,Occitanie,43.8555,1.6165,Cambisols,7.16,28.7,1.75
+France,Centre-Val de Loire,47.9495,1.5959,Calcisols,7.49,20.5,2.51
+France,Nouvelle-Aquitaine,44.952,0.4781,Luvisols,6.24,22.9,2.57
+France,Occitanie,43.2178,1.4976,Cambisols,7.56,28.8,2.37
+France,Centre-Val de Loire,47.6797,1.4888,Calcisols,7.79,22.2,2.77
+France,Nouvelle-Aquitaine,45.4644,0.1875,Luvisols,6.59,25.1,2.85
+France,Occitanie,43.9696,1.3688,Cambisols,7.53,27.5,1.7
+France,Centre-Val de Loire,47.3035,2.174,Calcisols,8.2,16.9,3.42
+France,Nouvelle-Aquitaine,44.9568,-0.2148,Luvisols,6.23,21.5,2.93
+France,Occitanie,43.3401,1.2657,Cambisols,7.35,32.5,2.14
+France,Centre-Val de Loire,47.9727,1.9343,Calcisols,7.95,17.9,3.09
+France,Nouvelle-Aquitaine,45.381,-0.2781,Luvisols,6.47,23.1,2.99
+France,Occitanie,43.7992,1.5089,Cambisols,6.93,28.1,2.41
+France,Centre-Val de Loire,47.878,1.7741,Calcisols,8.07,19.9,3.31
+France,Nouvelle-Aquitaine,44.9022,0.4516,Luvisols,6.54,27.2,2.7
+France,Occitanie,43.6083,1.2463,Cambisols,7.29,28.9,2.3
+France,Centre-Val de Loire,47.8014,1.7449,Calcisols,7.89,19,2.58
+France,Nouvelle-Aquitaine,45.3177,-0.2548,Luvisols,6.42,22.1,2.36
+France,Occitanie,43.6078,1.2713,Cambisols,7.56,27.5,2.3
+France,Centre-Val de Loire,47.2649,1.5353,Calcisols,7.45,20.8,3.2
+France,Nouvelle-Aquitaine,44.6164,-0.3927,Luvisols,6.42,23.3,2.21
+France,Occitanie,43.3445,1.8041,Cambisols,7,30.2,1.83
+France,Centre-Val de Loire,47.2119,1.9499,Calcisols,7.72,20.4,2.96
+France,Nouvelle-Aquitaine,44.5344,-0.2628,Luvisols,6.19,26.5,2.23
+France,Occitanie,43.8259,1.1044,Cambisols,6.97,26.7,2.11
+France,Centre-Val de Loire,47.7754,2.0986,Calcisols,7.6,18.6,3.11
+France,Nouvelle-Aquitaine,45.2217,-0.1495,Luvisols,6.34,26.1,2.88
+France,Occitanie,43.3544,1.9688,Cambisols,7.4,30.7,2.01
+France,Centre-Val de Loire,47.0575,1.4928,Calcisols,7.44,19.1,3.4
+France,Nouvelle-Aquitaine,45.4842,-0.3439,Luvisols,6.3,24.5,2.2
+France,Occitanie,43.7647,1.3109,Cambisols,7.04,27.4,1.66
+France,Centre-Val de Loire,47.6284,1.559,Calcisols,7.97,22.8,3
+France,Nouvelle-Aquitaine,45.2602,-0.0607,Luvisols,6.36,27.6,2.2
+France,Occitanie,43.9801,1.3637,Cambisols,7.59,27.4,1.93
+France,Centre-Val de Loire,47.8476,2.0072,Calcisols,7.84,21.6,3.36
+France,Nouvelle-Aquitaine,44.8661,-0.3938,Luvisols,6.52,25.7,2.29
+France,Occitanie,43.1046,1.8117,Cambisols,6.91,30.6,1.78
+France,Centre-Val de Loire,47.6728,1.4473,Calcisols,8.06,19.9,3.39
+France,Nouvelle-Aquitaine,44.6184,-0.1772,Luvisols,6.78,27.8,2.7
+France,Occitanie,43.0356,1.1655,Cambisols,6.97,32.3,2.44
+France,Centre-Val de Loire,47.8509,1.7075,Calcisols,7.41,22.4,3.4
+France,Nouvelle-Aquitaine,45.3281,-0.3386,Luvisols,6.25,27.6,2.58
+France,Occitanie,43.2663,1.2389,Cambisols,7.3,29.8,2.01
+France,Centre-Val de Loire,47.0298,2.0036,Calcisols,8.01,17.9,2.9
+France,Nouvelle-Aquitaine,45.4021,0.2347,Luvisols,6.16,28.8,2.89
+France,Occitanie,43.3735,1.7402,Cambisols,6.9,30.7,2.34
+France,Centre-Val de Loire,47.9237,1.3164,Calcisols,8.08,20.9,2.92
+France,Nouvelle-Aquitaine,44.6078,0.4609,Luvisols,6.55,27.9,2.13
+France,Occitanie,43.1662,1.8534,Cambisols,7.01,29.9,2.45
+France,Centre-Val de Loire,47.8907,2.2657,Calcisols,8.02,22.9,2.87
+France,Nouvelle-Aquitaine,45.0081,0.2583,Luvisols,6.43,26,2.47
+France,Occitanie,43.0208,1.6344,Cambisols,6.85,26.9,2.34
+France,Centre-Val de Loire,47.4745,1.7032,Calcisols,7.9,23.5,2.87
+France,Nouvelle-Aquitaine,44.7369,0.3044,Luvisols,6.23,21.5,2.09
+France,Occitanie,43.6194,1.5637,Cambisols,7,33.4,2.22
+France,Centre-Val de Loire,47.9072,1.9468,Calcisols,7.91,20.1,3.17
+France,Nouvelle-Aquitaine,45.4421,0.2928,Luvisols,6.44,25.2,2.68
+France,Occitanie,43.4703,1.6304,Cambisols,7.19,27.8,2.47
+France,Centre-Val de Loire,47.1183,1.5163,Calcisols,7.89,22.7,2.67
+France,Nouvelle-Aquitaine,45.1225,-0.1703,Luvisols,6.34,26.9,2.24
+France,Occitanie,43.0488,1.5219,Cambisols,7.56,28.4,1.98
+France,Centre-Val de Loire,47.887,2.0965,Calcisols,7.97,19.1,3.45
+France,Nouvelle-Aquitaine,45.4051,-0.0066,Luvisols,6.62,25.1,2.63
+France,Occitanie,43.3559,1.1465,Cambisols,7.38,28.9,1.95
+France,Centre-Val de Loire,47.8428,1.7826,Calcisols,7.59,23.6,2.62
+France,Nouvelle-Aquitaine,45.1216,0.3338,Luvisols,6.35,23.7,2.92
+France,Occitanie,43.8768,1.3496,Cambisols,7.58,29.7,2.46
+France,Centre-Val de Loire,47.9261,1.7315,Calcisols,7.98,18.2,3.03
+France,Nouvelle-Aquitaine,44.6608,0.4446,Luvisols,6.32,28.2,2.03
+France,Occitanie,43.6816,1.6463,Cambisols,6.95,31.1,1.86
+France,Centre-Val de Loire,47.023,1.5506,Calcisols,7.69,23.1,3.13
+Germany,Bavaria,49.1478,11.2633,Cambisols,6.25,26.7,3.6
+Germany,Lower Saxony,52.6727,9.1807,Podzols,5.67,18.9,2.36
+Germany,Bavaria,48.558,11.915,Cambisols,5.98,25.9,3.08
+Germany,Lower Saxony,52.7377,9.298,Podzols,6.03,15.2,2.63
+Germany,Bavaria,48.9621,11.6876,Cambisols,6.52,25.2,3.54
+Germany,Lower Saxony,52.2182,9.4258,Podzols,5.87,14.5,2.51
+Germany,Bavaria,49.2277,11.5699,Cambisols,5.93,26.1,2.72
+Germany,Lower Saxony,52.6262,9.8043,Podzols,6.19,13.5,2.3
+Germany,Bavaria,48.424,11.7751,Cambisols,6.27,24.3,2.83
+Germany,Lower Saxony,52.4241,9.3524,Podzols,5.63,12.6,3.17
+Germany,Bavaria,48.8379,11.5751,Cambisols,6.38,24.6,3.41
+Germany,Lower Saxony,52.9084,9.48,Podzols,5.81,13.8,2.73
+Germany,Bavaria,49.2166,11.9143,Cambisols,6.27,21.9,3.26
+Germany,Lower Saxony,52.2923,9.3684,Podzols,5.77,16.7,2.99
+Germany,Bavaria,48.3429,11.5054,Cambisols,6.31,24.7,3.47
+Germany,Lower Saxony,52.3568,9.7265,Podzols,5.42,11.9,2.4
+Germany,Bavaria,48.3729,11.2237,Cambisols,6.49,22.2,2.97
+Germany,Lower Saxony,52.3601,9.1938,Podzols,5.9,13.8,3.26
+Germany,Bavaria,48.3885,11.7602,Cambisols,6.41,25.7,3.54
+Germany,Lower Saxony,52.2796,9.559,Podzols,6.02,18,2.98
+Germany,Bavaria,48.5521,11.8596,Cambisols,6.54,25.9,2.81
+Germany,Lower Saxony,52.5066,9.8572,Podzols,6.15,13.6,3.09
+Germany,Bavaria,48.8612,11.3764,Cambisols,6.42,22,2.79
+Germany,Lower Saxony,52.331,9.376,Podzols,5.84,11.1,3.09
+Germany,Bavaria,48.5436,11.2894,Cambisols,6.52,26.5,3.35
+Germany,Lower Saxony,52.3601,9.7331,Podzols,5.94,18.8,2.92
+Germany,Bavaria,48.7529,11.4798,Cambisols,6.55,25.7,3.67
+Germany,Lower Saxony,52.2906,9.8346,Podzols,5.67,18.7,2.47
+Germany,Bavaria,49.2257,11.2191,Cambisols,6.67,26,3.06
+Germany,Lower Saxony,52.8892,9.9794,Podzols,5.85,18.7,2.85
+Germany,Bavaria,48.8706,11.7982,Cambisols,6.66,26.4,3.31
+Germany,Lower Saxony,52.5709,9.7481,Podzols,5.65,17.9,2.7
+Germany,Bavaria,48.4712,11.5912,Cambisols,5.95,27.3,2.73
+Germany,Lower Saxony,52.0566,9.9785,Podzols,5.58,12.1,3.24
+Germany,Bavaria,48.7975,11.2636,Cambisols,6.14,23.2,3.03
+Germany,Lower Saxony,52.1333,9.4912,Podzols,5.49,16.8,2.66
+Germany,Bavaria,48.4314,11.3983,Cambisols,6.01,27.2,2.99
+Germany,Lower Saxony,52.6495,9.821,Podzols,6.11,17.1,3.14
+Germany,Bavaria,48.3225,11.7106,Cambisols,6.2,23.5,3.46
+Germany,Lower Saxony,52.9256,9.8262,Podzols,6.02,14.6,3.2
+Germany,Bavaria,48.544,11.9011,Cambisols,6.17,22.2,3.54
+Germany,Lower Saxony,52.3033,9.1378,Podzols,5.63,17.8,2.38
+Germany,Bavaria,48.9828,11.0919,Cambisols,6.45,28.4,3.54
+Germany,Lower Saxony,52.4814,9.8583,Podzols,5.5,14.2,2.64
+Germany,Bavaria,48.4419,11.765,Cambisols,6.53,25.3,3.46
+Germany,Lower Saxony,52.7622,9.9502,Podzols,5.47,12,2.56
+Germany,Bavaria,48.449,11.085,Cambisols,6.27,24.1,3.22
+Germany,Lower Saxony,52.9864,9.0162,Podzols,5.55,17,2.66
+Germany,Bavaria,48.6344,11.7679,Cambisols,6.41,22.2,3.42
+Germany,Lower Saxony,52.2234,9.8981,Podzols,5.85,14.5,2.33
+Greece,Thessaly,39.0432,22.3827,Fluvisols,7.53,28.1,1.76
+Greece,Thessaly,39.3508,21.8212,Fluvisols,7.17,26.9,1.93
+Greece,Thessaly,39.2015,21.7931,Fluvisols,7.41,28.8,1.22
+Greece,Thessaly,39.6219,21.8041,Fluvisols,7.68,29.9,1.07
+Greece,Thessaly,39.8016,22.391,Fluvisols,7.45,29.4,1.66
+Greece,Thessaly,39.8487,22.4284,Fluvisols,7.08,29.4,1.17
+Greece,Thessaly,39.9022,21.5597,Fluvisols,7.26,27.1,1.17
+Greece,Thessaly,39.3232,22.057,Fluvisols,7.39,22.5,1.18
+Greece,Thessaly,39.6066,22.1195,Fluvisols,7.09,25.1,1.22
+Greece,Thessaly,39.5449,22.4464,Fluvisols,7.59,23.9,1.39
+Greece,Thessaly,39.0712,22.3785,Fluvisols,7.76,25.1,1.24
+Greece,Thessaly,39.6313,22.2024,Fluvisols,7.54,23.5,1.6
+Greece,Thessaly,39.8365,21.7307,Fluvisols,7.06,25.5,1.16
+Greece,Thessaly,39.8741,21.7178,Fluvisols,7.53,29.2,1.23
+Greece,Thessaly,39.9806,22.2024,Fluvisols,7.03,28.4,1.14
+Greece,Thessaly,39.6853,21.6018,Fluvisols,7.18,23.4,1.91
+Greece,Thessaly,39.907,21.6456,Fluvisols,7.41,23.7,1.3
+Greece,Thessaly,39.3372,21.6831,Fluvisols,7.13,28.3,1.33
+Greece,Thessaly,39.6346,22.392,Fluvisols,7.38,26.4,1.61
+Greece,Thessaly,39.3125,21.8137,Fluvisols,7.25,24.1,1.81
+Greece,Thessaly,39.4497,21.5608,Fluvisols,7.06,22.7,1.88
+Greece,Thessaly,39.5411,22.3287,Fluvisols,7.03,29.6,1.65
+Greece,Thessaly,39.461,21.9727,Fluvisols,7.42,27.1,1.08
+Greece,Thessaly,39.1213,22.3358,Fluvisols,7.05,29,1.89
+Greece,Thessaly,39.2164,21.7633,Fluvisols,7.17,26.5,1.9
+Hungary,Great Plain,46.5678,20.4277,Chernozem,7.04,32.5,4
+Hungary,Great Plain,46.932,20.3583,Chernozem,6.93,31.5,3.76
+Hungary,Great Plain,46.6839,20.0261,Chernozem,7.05,31,3.72
+Hungary,Great Plain,46.6943,19.6423,Chernozem,7.38,31.7,3.61
+Hungary,Great Plain,47.4947,20.2573,Chernozem,7.14,35.8,3.94
+Hungary,Great Plain,46.996,20.4588,Chernozem,7.47,32.2,3.78
+Hungary,Great Plain,46.5354,19.6113,Chernozem,6.88,29.5,4.09
+Hungary,Great Plain,46.9699,20.4276,Chernozem,7.29,33.4,3.69
+Hungary,Great Plain,46.6504,19.5171,Chernozem,6.96,31.4,3.62
+Hungary,Great Plain,47.4211,19.6433,Chernozem,7.4,35.6,4.39
+Hungary,Great Plain,47.0706,19.9339,Chernozem,6.94,35.6,4.51
+Hungary,Great Plain,47.0368,19.7294,Chernozem,7.57,32.2,4.02
+Hungary,Great Plain,46.6613,19.8724,Chernozem,6.95,28.5,4.6
+Hungary,Great Plain,46.535,20.4534,Chernozem,7.39,29.7,4.55
+Hungary,Great Plain,47.298,19.8217,Chernozem,7.21,30.5,4.23
+Hungary,Great Plain,47.1538,19.6213,Chernozem,7.04,32.4,4.29
+Hungary,Great Plain,46.5632,20.0795,Chernozem,7.36,34.9,4.09
+Hungary,Great Plain,47.2231,20.2048,Chernozem,7.26,33.7,3.7
+Hungary,Great Plain,47.2787,20.3911,Chernozem,7.14,34,4.43
+Hungary,Great Plain,46.8747,19.5884,Chernozem,7.54,30.1,4.2
+Hungary,Great Plain,47.3697,19.8386,Chernozem,6.89,28.4,3.87
+Hungary,Great Plain,47.252,20.13,Chernozem,7.52,33.8,3.82
+Hungary,Great Plain,46.8241,19.9172,Chernozem,7.42,31.3,3.76
+Hungary,Great Plain,47.3585,19.6601,Chernozem,7.11,33.7,4.32
+Hungary,Great Plain,46.6911,20.0741,Chernozem,7,34,4.07
+Italy,Lombardy,44.983,8.7554,Luvisols,6.44,28.9,2.47
+Italy,Puglia,41.0831,16.6984,Calcisols,7.98,24.5,1.43
+Italy,Lombardy,45.8526,9.1761,Luvisols,6.83,28.4,2.43
+Italy,Puglia,40.5284,16.5527,Calcisols,7.86,23.4,2.06
+Italy,Lombardy,45.5888,8.9319,Luvisols,6.47,26.9,2.7
+Italy,Puglia,40.528,16.8434,Calcisols,7.47,22.4,1.33
+Italy,Lombardy,45.0281,8.9088,Luvisols,6.89,30.1,2.72
+Italy,Puglia,41.3728,16.5602,Calcisols,7.68,21.5,2.08
+Italy,Lombardy,45.2858,9.5175,Luvisols,6.79,25.1,2.69
+Italy,Puglia,40.9269,16.827,Calcisols,7.96,23.3,2.21
+Italy,Lombardy,45.5241,9.5316,Luvisols,6.48,30.1,3.07
+Italy,Puglia,40.8066,16.1655,Calcisols,7.88,22,1.85
+Italy,Lombardy,45.4931,9.5985,Luvisols,6.77,26.2,3.28
+Italy,Puglia,41.0861,16.1891,Calcisols,7.36,19.7,2.2
+Italy,Lombardy,45.3082,9.5296,Luvisols,7.12,31.8,3.11
+Italy,Puglia,41.2364,16.16,Calcisols,7.88,21.4,1.81
+Italy,Lombardy,45.5468,8.703,Luvisols,6.9,25.7,2.76
+Italy,Puglia,41.415,16.8978,Calcisols,7.76,22.6,1.53
+Italy,Lombardy,45.3524,9.0108,Luvisols,6.95,28.7,3.04
+Italy,Puglia,40.6246,16.9723,Calcisols,7.57,19.7,1.38
+Italy,Lombardy,45.0776,8.9076,Luvisols,6.5,30.6,3
+Italy,Puglia,41.4178,16.3625,Calcisols,7.82,25.5,2
+Italy,Lombardy,45.0997,9.1901,Luvisols,6.95,25.4,2.44
+Italy,Puglia,41.3271,16.8805,Calcisols,7.25,25.6,2.16
+Italy,Lombardy,45.3639,9.3497,Luvisols,7.1,29.1,2.37
+Italy,Puglia,40.7593,16.8843,Calcisols,7.43,22.3,1.73
+Italy,Lombardy,45.8917,9.3302,Luvisols,6.45,29.1,2.53
+Italy,Puglia,40.5611,16.7746,Calcisols,7.9,19,1.38
+Italy,Lombardy,45.4764,9.1708,Luvisols,6.95,27.5,2.42
+Italy,Puglia,41.0959,16.232,Calcisols,7.43,18.6,2.03
+Italy,Lombardy,45.5599,9.0228,Luvisols,6.49,24.3,2.94
+Italy,Puglia,40.6211,16.5501,Calcisols,7.85,23.2,2.12
+Italy,Lombardy,45.1871,8.8883,Luvisols,6.57,29.4,3
+Italy,Puglia,40.614,16.8078,Calcisols,7.55,22.1,1.72
+Italy,Lombardy,45.6768,9.544,Luvisols,6.85,29.9,2.6
+Italy,Puglia,40.7526,16.2103,Calcisols,7.21,18.3,1.42
+Italy,Lombardy,45.4763,9.5912,Luvisols,6.49,32,2.52
+Italy,Puglia,41.3278,16.7269,Calcisols,7.48,20,2.24
+Italy,Lombardy,45.7701,9.4623,Luvisols,6.98,31.6,3
+Italy,Puglia,41.4119,16.947,Calcisols,7.57,19.9,2.22
+Italy,Lombardy,45.4854,9.2703,Luvisols,6.47,27.1,2.71
+Italy,Puglia,41.1461,16.7185,Calcisols,7.59,19.9,1.79
+Italy,Lombardy,45.6262,9.3697,Luvisols,6.56,29.7,2.39
+Italy,Puglia,41.4577,16.3138,Calcisols,7.22,18.6,1.82
+Italy,Lombardy,45.3351,8.8527,Luvisols,6.5,25.4,2.55
+Italy,Puglia,40.6875,16.0292,Calcisols,7.33,23.6,1.56
+Italy,Lombardy,45.7671,8.8579,Luvisols,6.81,30.3,2.69
+Italy,Puglia,41.3621,16.7812,Calcisols,7.92,20.9,2.18
+Italy,Lombardy,45.5433,9.1126,Luvisols,7.05,30.4,3.16
+Italy,Puglia,40.8637,16.8046,Calcisols,7.85,19.1,1.5
+Poland,Masovia,52.5799,21.4813,Podzols,5.25,18,2.11
+Poland,Masovia,51.9103,20.9229,Podzols,5.33,11.7,2
+Poland,Masovia,51.8521,21.1016,Podzols,5.38,15.9,1.63
+Poland,Masovia,52.1164,20.6869,Podzols,5.24,13.6,2.19
+Poland,Masovia,51.7576,20.6717,Podzols,5.12,18.7,2
+Poland,Masovia,52.4487,20.6604,Podzols,5.79,17.8,1.65
+Poland,Masovia,51.9601,21.2019,Podzols,5.68,12.5,1.96
+Poland,Masovia,52.1178,20.5697,Podzols,5.11,13.2,2.15
+Poland,Masovia,52.6377,21.057,Podzols,5.79,13.5,2.12
+Poland,Masovia,52.5333,20.9573,Podzols,5.41,16.6,2.41
+Poland,Masovia,52.2953,21.0226,Podzols,5.51,13.2,2.35
+Poland,Masovia,52.6051,21.4267,Podzols,5.44,11.7,2.19
+Poland,Masovia,52.6053,20.6893,Podzols,5.29,17.5,1.77
+Poland,Masovia,52.188,21.2089,Podzols,5.15,18.5,1.81
+Poland,Masovia,52.0306,20.6677,Podzols,5.67,17.1,1.9
+Poland,Masovia,52.1563,21.0833,Podzols,5.71,17.3,2.06
+Poland,Masovia,52.3966,21.0396,Podzols,5.43,17,1.65
+Poland,Masovia,52.3602,21.4446,Podzols,5.32,15.8,1.7
+Poland,Masovia,51.9551,20.8167,Podzols,5.71,11.6,1.97
+Poland,Masovia,52.1694,21.3244,Podzols,5.8,11,1.72
+Poland,Masovia,51.8231,21.0891,Podzols,5.53,17.6,2.15
+Poland,Masovia,52.5619,21.1559,Podzols,5.51,12.3,2.06
+Poland,Masovia,52.555,21.248,Podzols,5.89,17.7,2.47
+Poland,Masovia,52.377,20.8683,Podzols,5.65,18,2.01
+Poland,Masovia,51.7596,21.3212,Podzols,5.13,18.4,1.75
+Romania,Bărăgan,44.2754,26.7772,Chernozem,7.09,32.5,4.46
+Romania,Moldova,46.1811,27.5808,Chernozem,6.6,33.8,3.57
+Romania,Transilvania,46.7071,24.4332,Cambisols,6.15,26.7,3.67
+Romania,Bărăgan,44.1713,26.8032,Chernozem,6.61,31,4.17
+Romania,Moldova,46.4881,27.2758,Chernozem,6.6,27.3,4.29
+Romania,Transilvania,46.421,23.8507,Cambisols,6.81,23.2,3.57
+Romania,Bărăgan,44.7952,27.2512,Chernozem,7,35.9,4.61
+Romania,Moldova,46.4552,27.1614,Chernozem,7.12,27.1,3.75
+Romania,Transilvania,46.7203,24.3428,Cambisols,6.25,26.2,3.1
+Romania,Bărăgan,44.1546,27.3211,Chernozem,7.06,31.9,4.91
+Romania,Moldova,46.1181,27.405,Chernozem,6.8,26.9,4.17
+Romania,Transilvania,46.2723,24.337,Cambisols,6.46,24.2,3.08
+Romania,Bărăgan,44.6913,26.8992,Chernozem,6.82,32.8,4.7
+Romania,Moldova,46.0795,27.3986,Chernozem,6.59,29.1,4.27
+Romania,Transilvania,46.3398,23.9542,Cambisols,6.72,26.7,3.98
+Romania,Bărăgan,44.8215,26.5288,Chernozem,7.14,32.6,4.63
+Romania,Moldova,46.1461,27.2391,Chernozem,6.74,29.6,4.32
+Romania,Transilvania,46.302,24.0285,Cambisols,6.38,26.6,3.04
+Romania,Bărăgan,44.8841,26.9059,Chernozem,7.06,34.4,4.49
+Romania,Moldova,46.1442,27.6834,Chernozem,7.16,27.4,4.01
+Romania,Transilvania,46.6785,23.7716,Cambisols,6.59,23.1,3.22
+Romania,Bărăgan,44.5185,27.0462,Chernozem,6.77,32.7,4.5
+Romania,Moldova,46.1211,27.0852,Chernozem,7.05,27.7,3.97
+Romania,Transilvania,46.298,24.3486,Cambisols,6.19,23.8,3.18
+Romania,Bărăgan,44.2285,26.7272,Chernozem,6.93,32.4,4.32
+Romania,Moldova,46.0065,27.1877,Chernozem,6.86,32.9,4.31
+Romania,Transilvania,46.024,24.1392,Cambisols,6.79,24,3.96
+Romania,Bărăgan,44.0453,27.4948,Chernozem,6.6,33.5,4.81
+Romania,Moldova,46.4983,27.0811,Chernozem,6.62,29.9,4.04
+Romania,Transilvania,46.7297,23.671,Cambisols,6.84,23.5,3.72
+Romania,Bărăgan,44.5385,26.828,Chernozem,7.19,36.8,4.98
+Romania,Moldova,46.9532,26.8595,Chernozem,6.75,31.9,3.63
+Romania,Transilvania,46.9106,24.3619,Cambisols,6.82,24.3,3.89
+Romania,Bărăgan,44.9099,27.0105,Chernozem,7.08,36.5,4.45
+Romania,Moldova,46.1548,26.9509,Chernozem,6.64,26.7,4.17
+Romania,Transilvania,46.3735,24.386,Cambisols,6.81,28.2,3.36
+Romania,Bărăgan,44.529,26.5537,Chernozem,6.95,38.8,4.86
+Romania,Moldova,46.0353,27.2738,Chernozem,6.97,29.6,3.76
+Romania,Transilvania,46.7275,23.9051,Cambisols,6.8,26.6,3.1
+Romania,Bărăgan,44.6095,26.8024,Chernozem,6.97,36.1,4.45
+Romania,Moldova,46.7143,27.5446,Chernozem,6.7,30.5,4
+Romania,Transilvania,46.9601,24.0167,Cambisols,6.52,26.4,3.1
+Romania,Bărăgan,44.0615,26.9483,Chernozem,6.8,35.9,4.64
+Romania,Moldova,46.1346,27.5025,Chernozem,7.11,26,3.51
+Romania,Transilvania,46.1428,23.5536,Cambisols,6.13,29,3.32
+Romania,Bărăgan,44.4028,26.6056,Chernozem,7.1,35.4,4.31
+Romania,Moldova,46.8691,27.663,Chernozem,6.69,27.4,3.67
+Romania,Transilvania,46.1243,23.5123,Cambisols,6.42,25,3.12
+Romania,Bărăgan,44.5773,26.8896,Chernozem,7.14,36.9,4.4
+Romania,Moldova,46.6533,27.2529,Chernozem,6.61,30.3,3.87
+Romania,Transilvania,46.3282,23.8168,Cambisols,6.26,24.3,3.32
+Romania,Bărăgan,44.6533,27.2365,Chernozem,7.25,38.1,4.78
+Romania,Moldova,46.2856,26.8947,Chernozem,6.57,27.8,3.95
+Romania,Transilvania,46.7174,23.6722,Cambisols,6.64,23.2,3.51
+Romania,Bărăgan,44.2793,27.1148,Chernozem,6.86,33.4,4.1
+Romania,Moldova,46.874,27.0294,Chernozem,7.14,29.4,4.47
+Romania,Transilvania,46.4677,23.8146,Cambisols,6.59,26.5,3.23
+Romania,Bărăgan,44.4915,26.5936,Chernozem,7.28,31.3,4.19
+Romania,Moldova,46.0881,26.8749,Chernozem,6.91,30.6,3.95
+Romania,Transilvania,46.0018,23.5175,Cambisols,6.22,27.6,3.38
+Romania,Bărăgan,44.9498,27.2837,Chernozem,7.34,32.1,4.31
+Romania,Moldova,46.9084,27.1758,Chernozem,6.7,28.4,3.99
+Romania,Transilvania,46.2306,24.0984,Cambisols,6.34,21.3,3.76
+Romania,Bărăgan,44.4031,27.4642,Chernozem,7.01,31.8,4.7
+Romania,Moldova,46.4857,27.2356,Chernozem,7.07,33.2,3.67
+Romania,Transilvania,46.1872,24.2244,Cambisols,6.25,25.2,3.06
+Romania,Bărăgan,44.3858,27.465,Chernozem,6.84,33.3,4.12
+Romania,Moldova,46.3149,27.3521,Chernozem,7.08,33.6,4.29
+Romania,Transilvania,46.3764,24.143,Cambisols,6.27,27.4,3.86
+Romania,Bărăgan,44.7999,27.0137,Chernozem,6.86,37.2,4.48
+Romania,Moldova,46.7162,26.7883,Chernozem,7.05,32.4,3.65
+Romania,Transilvania,46.2218,23.8442,Cambisols,6.6,23.8,3.11
+Romania,Bărăgan,44.4801,27.2852,Chernozem,6.84,36.6,4.97
+Romania,Moldova,46.2938,26.7711,Chernozem,7.14,27.5,3.72
+Romania,Transilvania,46.0115,24.3208,Cambisols,6.29,27.1,3.65
+Spain,Andalucia,37.2996,-6.3356,Vertisols,8.12,42.8,1.17
+Spain,Castile and Leon,41.5272,-4.9521,Calcisols,7.76,30.3,1.9
+Spain,Andalucia,37.7334,-5.4942,Vertisols,8.35,43.3,1.2
+Spain,Castile and Leon,41.5748,-4.0645,Calcisols,7.71,26.7,1.31
+Spain,Andalucia,37.0627,-6.077,Vertisols,8.21,43.3,1
+Spain,Castile and Leon,41.7464,-4.1372,Calcisols,7.29,31.6,1.83
+Spain,Andalucia,36.9265,-6.2964,Vertisols,7.7,40.7,1.1
+Spain,Castile and Leon,41.7338,-4.0453,Calcisols,7.54,27,1.88
+Spain,Andalucia,37.1294,-5.5639,Vertisols,8.22,37.4,1.45
+Spain,Castile and Leon,41.8556,-4.1953,Calcisols,7.6,25,1.11
+Spain,Andalucia,37.1462,-5.7592,Vertisols,7.63,43.1,1.4
+Spain,Castile and Leon,41.8403,-4.737,Calcisols,7.23,29.6,1.33
+Spain,Andalucia,37.3082,-6.1313,Vertisols,8.24,38.6,1.08
+Spain,Castile and Leon,41.6413,-4.2588,Calcisols,7.86,31,1.76
+Spain,Andalucia,37.0742,-5.4776,Vertisols,8.39,39.7,0.91
+Spain,Castile and Leon,41.9842,-4.4405,Calcisols,7.84,27.8,1.52
+Spain,Andalucia,37.1157,-6.3882,Vertisols,8.38,42,0.95
+Spain,Castile and Leon,41.3473,-4.031,Calcisols,7.54,24.7,1.82
+Spain,Andalucia,37.738,-6.2016,Vertisols,8.3,37.9,1.31
+Spain,Castile and Leon,41.7047,-4.4321,Calcisols,7.13,24.1,1.91
+Spain,Andalucia,37.5407,-5.8499,Vertisols,8.18,43.5,1.57
+Spain,Castile and Leon,41.4934,-4.1339,Calcisols,7.55,27.3,1.09
+Spain,Andalucia,37.0294,-6.3669,Vertisols,7.91,37.5,1.26
+Spain,Castile and Leon,41.2499,-4.4133,Calcisols,7.65,27.7,1.66
+Spain,Andalucia,37.3746,-6.219,Vertisols,7.83,37,1.4
+Spain,Castile and Leon,41.6102,-4.0912,Calcisols,7.13,26.7,1.21
+Spain,Andalucia,36.9249,-5.5719,Vertisols,8.32,38.5,1.28
+Spain,Castile and Leon,41.5091,-4.9984,Calcisols,7.22,31.1,1.96
+Spain,Andalucia,37.7922,-5.4229,Vertisols,8.18,41.1,1.43
+Spain,Castile and Leon,41.8317,-4.7441,Calcisols,7.2,27.3,1.69
+Spain,Andalucia,37.2667,-6.2867,Vertisols,8.08,42.9,0.96
+Spain,Castile and Leon,41.0968,-4.8187,Calcisols,7.18,24.8,1.88
+Spain,Andalucia,37.1332,-6.3559,Vertisols,7.88,43.7,1.03
+Spain,Castile and Leon,41.1469,-4.3367,Calcisols,7.42,30.1,1.14
+Spain,Andalucia,37.1526,-5.5124,Vertisols,7.85,37.6,1.6
+Spain,Castile and Leon,41.3704,-4.9426,Calcisols,7.73,27.1,1.52
+Spain,Andalucia,37.1257,-5.977,Vertisols,7.86,37.4,1.31
+Spain,Castile and Leon,41.9748,-4.7447,Calcisols,7.8,25.6,1.28
+Spain,Andalucia,37.1598,-6.0823,Vertisols,8.35,37.8,1.28
+Spain,Castile and Leon,41.0447,-4.4384,Calcisols,7.19,26.9,1.65
+Spain,Andalucia,37.4402,-5.4287,Vertisols,8.1,37,0.77
+Spain,Castile and Leon,41.7659,-4.2249,Calcisols,7.77,27.1,1.39
+Spain,Andalucia,37.7407,-5.8728,Vertisols,7.66,41.6,0.95
+Spain,Castile and Leon,41.4546,-4.1332,Calcisols,7.74,26.7,1.51
+Spain,Andalucia,36.805,-6.2486,Vertisols,7.75,38.5,1.16
+Spain,Castile and Leon,41.6564,-4.4149,Calcisols,7.46,26.8,1.8
+Spain,Andalucia,37.1715,-6.2921,Vertisols,7.62,39,1.09
+Spain,Castile and Leon,41.5818,-4.8947,Calcisols,7.89,24.8,1.23
+Spain,Andalucia,37.1148,-5.7604,Vertisols,7.89,42.8,0.79
+Spain,Castile and Leon,41.9815,-4.0603,Calcisols,7.89,25.1,1.19
+UK,East Anglia,52.2206,0.7547,Cambisols,6.51,23.9,3.04
+UK,East Anglia,52.7573,0.7883,Cambisols,6.2,17.4,3.25
+UK,East Anglia,52.9609,1.4485,Cambisols,6.11,22.1,3.36
+UK,East Anglia,52.497,1.2871,Cambisols,6.75,19.4,2.78
+UK,East Anglia,52.9753,1.369,Cambisols,6.66,17.7,2.57
+UK,East Anglia,52.1752,0.8635,Cambisols,6.64,17.4,3.26
+UK,East Anglia,52.0549,0.7892,Cambisols,6.37,18.7,2.63
+UK,East Anglia,52.6534,1.103,Cambisols,6.39,18.5,2.61
+UK,East Anglia,52.4167,1.4373,Cambisols,6.28,22.4,2.7
+UK,East Anglia,52.4968,1.0424,Cambisols,6.72,22.5,2.59
+UK,East Anglia,52.9131,0.8812,Cambisols,6.56,21.4,2.7
+UK,East Anglia,52.4889,1.3446,Cambisols,6.64,17.7,2.93
+UK,East Anglia,52.3758,0.9651,Cambisols,6.59,18.5,2.58
+UK,East Anglia,52.4991,1.3569,Cambisols,6.15,21.7,2.7
+UK,East Anglia,52.0388,1.4743,Cambisols,6.48,18.4,2.6
+UK,East Anglia,52.2824,0.9092,Cambisols,6.69,16.5,2.59
+UK,East Anglia,52.256,1.161,Cambisols,6.84,17.3,3.06
+UK,East Anglia,52.0856,0.6245,Cambisols,6.35,22.8,2.89
+UK,East Anglia,52.2139,1.2167,Cambisols,6.9,22.9,2.73
+UK,East Anglia,52.5491,1.0564,Cambisols,6.38,23.9,2.72
+UK,East Anglia,52.4545,0.6342,Cambisols,6.19,17.8,3.13
+UK,East Anglia,52.5757,0.6888,Cambisols,6.24,22.9,3.15
+UK,East Anglia,52.6836,1.4023,Cambisols,6.52,19.7,3.3
+UK,East Anglia,52.4915,1.3173,Cambisols,6.3,23.8,2.85
+UK,East Anglia,52.9961,0.988,Cambisols,6.24,19.1,2.9
+Ukraine,Central Steppe,48.7536,31.9744,Chernozem,7.21,41.2,5.3
+Ukraine,Central Steppe,48.7547,31.6732,Chernozem,6.99,36.5,4.92
+Ukraine,Central Steppe,49.0368,32.3241,Chernozem,7.22,40.6,5.52
+Ukraine,Central Steppe,49.4601,32.4885,Chernozem,7.28,41.6,5.2
+Ukraine,Central Steppe,49.203,31.6355,Chernozem,7.22,38.1,5.54
+Ukraine,Central Steppe,49.2196,31.7544,Chernozem,6.81,39.3,5.2
+Ukraine,Central Steppe,49.0545,31.6743,Chernozem,6.9,35.7,4.95
+Ukraine,Central Steppe,48.5956,32.2928,Chernozem,6.91,39.8,4.71
+Ukraine,Central Steppe,48.5414,31.7657,Chernozem,7.28,34.4,5.5
+Ukraine,Central Steppe,48.7034,32.4682,Chernozem,6.75,37,5.47
+Ukraine,Central Steppe,49.3827,31.823,Chernozem,7.14,35.2,5.32
+Ukraine,Central Steppe,49.0294,31.9184,Chernozem,7.23,35.5,5.5
+Ukraine,Central Steppe,48.5493,32.1987,Chernozem,7.22,35.2,5.65
+Ukraine,Central Steppe,48.7541,31.7563,Chernozem,6.91,41.2,5.69
+Ukraine,Central Steppe,48.9707,31.6343,Chernozem,7.29,40.8,5.07
+Ukraine,Central Steppe,49.4323,31.9847,Chernozem,6.93,41.3,5.43
+Ukraine,Central Steppe,48.9497,31.9929,Chernozem,7.39,34.9,5.4
+Ukraine,Central Steppe,49.4733,31.9647,Chernozem,7.32,39.1,5.64
+Ukraine,Central Steppe,48.8421,31.5578,Chernozem,7.37,35.7,5.05
+Ukraine,Central Steppe,48.5716,32.3636,Chernozem,6.85,41.2,5.1
+Ukraine,Central Steppe,48.6876,32.3684,Chernozem,6.89,40.4,5.48
+Ukraine,Central Steppe,49.3698,32.1294,Chernozem,6.78,39.3,4.97
+Ukraine,Central Steppe,48.572,32.0768,Chernozem,7.22,38.2,5.08
+Ukraine,Central Steppe,48.7622,31.8195,Chernozem,6.9,38.4,5.49
+Ukraine,Central Steppe,48.6792,32.1794,Chernozem,7.37,38.6,4.9

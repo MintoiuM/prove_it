@@ -1,0 +1,11 @@
+clay_pct,confidence,country,frost_risk,hard_violations,humidity_pct,lat,lon,mean_temp_c,missing_features,nuts_region,point_id,rainfall_mm,rules_reasoning,rules_score_before_nuts2,score,score_band,soil_error,soil_ok,soil_organic_carbon_gkg,soil_ph,temp_std_c,weather_error,weather_ok,weather_stress_ratio,wind_speed_10m_kmh
+32.6,0.817,Romania,0.017,"[""mean_temp_c""]",71.008,45.054317,25.622036,6.633,"[""et0_mm"", ""soil_moisture_1_3cm"", ""sand_pct""]",Sud-Muntenia,P003,1280.42,"Best-ranked site P003 for Corn scores 44.7% (fair), based on matching weather and soil signals to crop-specific ideal and limit ranges. Confidence reflects how many inputs were present (about 82% here).
+
+What looks strong: Soil pH (7.14) is within the ideal band (5.8–7.2) for Corn. Frost exposure (1.7% of hours at or below freezing) is within the ideal band (0–0.12) for Corn. Soil organic carbon (26.9 g/kg) is within the ideal band (11–28) for Corn. Clay content (32.6%) is within the ideal band (12–38) for Corn. Relative humidity (71.0%) is within the ideal band (45–75) for Corn. Wind speed (7.0 km/h) is within the ideal band (2–16) for Corn. Severe-weather stress (0.0% of hours with severe weather codes) is within the ideal band (0–0.07) for Corn.
+
+What is acceptable but not ideal: Rainfall is 1280 mm (annualized), above the ideal range (450–900) but still inside acceptable bounds (250–1300), which can add stress or management needs.
+
+What works against the site: Mean temperature is 6.6 °C, outside the viable range (10–35) for Corn (ideal 18–27). This heavily penalizes suitability.
+
+Data limitations: no values for Reference evapotranspiration (ET0), Surface soil moisture, Sand content. Those gaps reduce confidence and apply a scoring penalty.",54.502,44.692,fair,,True,26.854,7.14,4.487,,True,0.0,7.017
+35.4,0.747,Romania,0.0,"[""mean_temp_c"", ""rainfall_mm""]",71.275,44.285622,26.345366,8.881,"[""et0_mm"", ""soil_moisture_1_3cm"", ""sand_pct""]",Sud-Muntenia,P001,1322.395,,45.717,37.488,fair,,True,24.998,7.1,4.37,,True,0.0,9.479

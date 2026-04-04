@@ -7,10 +7,18 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from typing import Any
 
+from src.collectors.europe_soil_csv import EuropeCsvSoilWorker
+from src.collectors.google_weather_worker import GoogleForecastWeatherWorker
 from src.collectors.http_utils import HttpJsonClient, RetryPolicy
 from src.collectors.soil_worker import SoilWorker
 from src.collectors.weather_worker import WeatherWorker
-from src.config import Settings
+from src.config import Settings, resolve_nuts2_yields_csv_path
+from src.data.nuts2_yields import (
+    Nuts2YieldStore,
+    blend_rules_score_with_yield,
+    crop_slug_to_yield_column,
+    yield_to_score_0_100,
+)
 from src.geo.grid import generate_candidate_points
 from src.io.cache import FileCache
 from src.models.crop_profiles import get_crop_profile, list_crop_names
@@ -20,8 +28,11 @@ from src.output.recommendation import (
     write_csv,
     write_json,
 )
+from src.output.rules_reasoning import build_site_reasoning
+from src.scoring.gemini_ranking import rank_with_gemini
 from src.scoring.llm_ranking import rank_with_llama3
 from src.scoring.suitability import rank_candidates
+from src.types import CandidatePoint
 
 
 def parse_args() -> argparse.Namespace:
@@ -49,6 +60,21 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Use Llama 3 (Ollama) to score and rank candidates.",
     )
+    parser.add_argument(
+        "--risk-analysis",
+        action="store_true",
+        help="Compute risk profile and risk level for each candidate.",
+    )
+    parser.add_argument(
+        "--extended-reasoning",
+        action="store_true",
+        help="Ask LLM for longer agronomic explanations.",
+    )
+    parser.add_argument(
+        "--region",
+        default="",
+        help="NUTS / Eurostat region label from nuts2_crop_yields_all_regions.csv (optional).",
+    )
     return parser.parse_args()
 
 
@@ -64,11 +90,16 @@ def main() -> int:
         end_date=args.end_date,
         demo_safe=args.demo_safe,
         use_llm=args.use_llm,
+        risk_analysis=args.risk_analysis,
+        extended_reasoning=args.extended_reasoning,
+        region=(args.region.strip() or None),
     )
     best_point = result["best_point"]
 
     print(f"Run completed: {result['run_id']}")
-    print(f"Country: {result['country']}, Crop: {result['crop']}")
+    reg = result.get("region")
+    reg_part = f", Region: {reg}" if reg else ""
+    print(f"Country: {result['country']}{reg_part}, Crop: {result['crop']}")
     print(
         "Best point: "
         f"{best_point['point_id']} ({best_point['lat']}, {best_point['lon']}) "
@@ -76,6 +107,51 @@ def main() -> int:
     )
     print(f"Artifacts: {result['run_dir']}")
     return 0
+
+
+def _nuts2_yield_lookup_label(points: list[CandidatePoint]) -> str | None:
+    if not points:
+        return None
+    if points[0].region:
+        return points[0].region
+    return points[0].country
+
+
+def _apply_nuts2_yield_scores(
+    rows: list[dict[str, Any]],
+    crop_slug: str,
+    yield_label: str | None,
+    store: Nuts2YieldStore | None,
+) -> dict[str, Any]:
+    meta: dict[str, Any] = {
+        "nuts2_yield_tons_ha": None,
+        "nuts2_yield_year": None,
+        "nuts2_yield_score": None,
+        "nuts2_yield_applied": False,
+        "nuts2_crop_in_file": crop_slug_to_yield_column(crop_slug) is not None,
+    }
+    if store is None or not yield_label:
+        return meta
+    if crop_slug_to_yield_column(crop_slug) is None:
+        return meta
+    tons = store.lookup_yield_tons_ha(yield_label, crop_slug)
+    year = store.latest_year(yield_label)
+    if tons is None:
+        return meta
+    yscore = yield_to_score_0_100(tons, crop_slug)
+    meta.update(
+        {
+            "nuts2_yield_tons_ha": tons,
+            "nuts2_yield_year": year,
+            "nuts2_yield_score": round(yscore, 2),
+            "nuts2_yield_applied": True,
+        }
+    )
+    for row in rows:
+        base = float(row.get("score", 0.0) or 0.0)
+        row["rules_score_before_nuts2"] = base
+        row["score"] = blend_rules_score_with_yield(base, yscore)
+    return meta
 
 
 def run_pipeline(
@@ -88,6 +164,9 @@ def run_pipeline(
     end_date: str,
     demo_safe: bool,
     use_llm: bool = False,
+    risk_analysis: bool = False,
+    extended_reasoning: bool = False,
+    region: str | None = None,
 ) -> dict[str, Any]:
     settings = Settings.from_env()
     run_id = f"run_{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}_{uuid.uuid4().hex[:6]}"
@@ -95,7 +174,12 @@ def run_pipeline(
     cache = FileCache(settings.cache_dir)
 
     crop_profile = get_crop_profile(crop)
-    generated_points = generate_candidate_points(country, point_count=points, seed=seed)
+    nuts2_path = resolve_nuts2_yields_csv_path()
+    nuts2_store = Nuts2YieldStore(nuts2_path) if nuts2_path else None
+
+    generated_points = generate_candidate_points(
+        country, point_count=points, seed=seed, region=region
+    )
 
     weather_workers = 2 if demo_safe else settings.weather_workers
     weather_client = HttpJsonClient(
@@ -110,25 +194,33 @@ def run_pipeline(
         ),
         cache=cache,
     )
-    soil_client = HttpJsonClient(
-        retry_policy=RetryPolicy(
-            timeout_seconds=settings.request_timeout_seconds,
-            retries=settings.request_retries,
-            backoff_base_seconds=settings.request_backoff_base_seconds,
-            backoff_max_seconds=settings.request_backoff_max_seconds,
-            min_interval_seconds=max(
-                settings.soil_min_interval_seconds, 1.2 if demo_safe else 0.0
+    if settings.weather_backend == "google_forecast" and settings.google_maps_api_key:
+        weather_worker = GoogleForecastWeatherWorker(
+            weather_client, settings.google_maps_api_key
+        )
+    else:
+        weather_worker = WeatherWorker(
+            client=weather_client,
+            endpoint=settings.weather_endpoint,
+            start_date=start_date,
+            end_date=end_date,
+        )
+    if settings.soil_dataset_csv_path is not None:
+        soil_worker = EuropeCsvSoilWorker(settings.soil_dataset_csv_path)
+    else:
+        soil_client = HttpJsonClient(
+            retry_policy=RetryPolicy(
+                timeout_seconds=settings.request_timeout_seconds,
+                retries=settings.request_retries,
+                backoff_base_seconds=settings.request_backoff_base_seconds,
+                backoff_max_seconds=settings.request_backoff_max_seconds,
+                min_interval_seconds=max(
+                    settings.soil_min_interval_seconds, 1.2 if demo_safe else 0.0
+                ),
             ),
-        ),
-        cache=cache,
-    )
-    weather_worker = WeatherWorker(
-        client=weather_client,
-        endpoint=settings.weather_endpoint,
-        start_date=start_date,
-        end_date=end_date,
-    )
-    soil_worker = SoilWorker(client=soil_client, endpoint=settings.soil_endpoint)
+            cache=cache,
+        )
+        soil_worker = SoilWorker(client=soil_client, endpoint=settings.soil_endpoint)
 
     stage_start = time.perf_counter()
     merged_rows = _collect_features(
@@ -146,31 +238,81 @@ def run_pipeline(
     )
     if failed_points / len(merged_rows) > settings.failure_abort_ratio:
         raise RuntimeError(
-            "Aborting run: too many points failed both sources "
-            f"({failed_points}/{len(merged_rows)})."
+            "Aborting run: too many points failed both weather and soil "
+            f"({failed_points}/{len(merged_rows)}), above FAILURE_ABORT_RATIO "
+            f"({settings.failure_abort_ratio}). "
+            "SoilGrids often rate-limits or returns 5xx. Try: Safe demo mode in the UI "
+            "(cached/throttled), increase REQUEST_RETRIES and REQUEST_TIMEOUT_SECONDS, "
+            "raise SOIL_MIN_INTERVAL_SECONDS (e.g. 1.0–1.5s), reduce WEATHER_WORKERS, "
+            "or lower FAILURE_ABORT_RATIO only if you accept scoring on sparse data."
         )
 
     stage_start = time.perf_counter()
     ranking_engine = "rules"
     if use_llm:
-        all_ranked = rank_with_llama3(
-            candidate_rows=merged_rows,
-            crop=crop_profile.name,
-            ollama_endpoint=settings.ollama_endpoint,
-            ollama_model=settings.ollama_model,
-            timeout_seconds=settings.llm_timeout_seconds,
-            max_points=min(settings.llm_max_points, len(merged_rows)),
+        # Rules order picks which points go to the LLM; LLM re-ranks that slice only.
+        # Remaining shortlist positions use rules scores so top_n (and the map) still
+        # show the requested number of sites when LLM_MAX_POINTS is small.
+        rules_first = rank_candidates(
+            merged_rows, profile=crop_profile, top_n=len(merged_rows)
         )
-        for row in all_ranked:
+        llm_cap = min(max(1, settings.llm_max_points), len(rules_first))
+        llm_slice = rules_first[:llm_cap]
+        if settings.llm_provider == "gemini":
+            if not settings.gemini_api_key:
+                raise RuntimeError(
+                    "GEMINI_API_KEY is required when LLM_PROVIDER=gemini (or use LLM_PROVIDER=ollama)."
+                )
+            llm_ranked = rank_with_gemini(
+                candidate_rows=llm_slice,
+                crop=crop_profile.name,
+                api_key=settings.gemini_api_key,
+                model=settings.gemini_model,
+                timeout_seconds=settings.llm_timeout_seconds,
+                max_points=llm_cap,
+                extended_reasoning=extended_reasoning,
+            )
+            ranking_engine = "gemini"
+        else:
+            llm_ranked = rank_with_llama3(
+                candidate_rows=llm_slice,
+                crop=crop_profile.name,
+                ollama_endpoint=settings.ollama_endpoint,
+                ollama_model=settings.ollama_model,
+                timeout_seconds=settings.llm_timeout_seconds,
+                max_points=llm_cap,
+                extended_reasoning=extended_reasoning,
+            )
+            ranking_engine = "llama3"
+        for row in llm_ranked:
             row["score"] = row["llm_score"]
             row["score_band"] = row["llm_rating"]
-        ranking_engine = "llama3"
+        tail = rules_first[llm_cap:]
+        for row in tail:
+            row.setdefault("decision_source", "rules")
+        all_ranked = llm_ranked + tail
     else:
         all_ranked = rank_candidates(merged_rows, profile=crop_profile, top_n=len(merged_rows))
 
+    if risk_analysis:
+        _attach_risk_metrics(all_ranked)
+
+    nuts_meta = _apply_nuts2_yield_scores(
+        all_ranked,
+        crop,
+        _nuts2_yield_lookup_label(generated_points),
+        nuts2_store,
+    )
+
     score_elapsed = round(time.perf_counter() - stage_start, 3)
     ranked_points = all_ranked[: max(1, top_n)]
+    # One list may mix LLM scores with rules scores (hybrid mode); order by numeric score
+    # so best_point, exports, and UI "top score" match the highest value in the shortlist.
+    ranked_points.sort(
+        key=lambda r: (-float(r.get("score") or 0.0), str(r.get("point_id", "")))
+    )
     best_point = ranked_points[0]
+    best_point["rules_reasoning"] = build_site_reasoning(best_point, crop_profile)
 
     summary = {
         "total_points": len(generated_points),
@@ -185,6 +327,10 @@ def run_pipeline(
             "score_and_rank": score_elapsed,
         },
         "ranking_engine": ranking_engine,
+        "risk_analysis_enabled": risk_analysis,
+        "extended_reasoning_enabled": extended_reasoning,
+        "region": generated_points[0].region,
+        **nuts_meta,
     }
 
     recommendation = build_recommendation_payload(
@@ -195,7 +341,15 @@ def run_pipeline(
         ranked_points=ranked_points,
         summary=summary,
         ranking_engine=ranking_engine,
-        llm_model=(settings.ollama_model if use_llm else None),
+        llm_model=(
+            (
+                settings.gemini_model
+                if settings.llm_provider == "gemini"
+                else settings.ollama_model
+            )
+            if use_llm
+            else None
+        ),
     )
 
     write_csv(run_dir / "candidates.csv", merged_rows)
@@ -207,12 +361,52 @@ def run_pipeline(
         "run_dir": str(run_dir),
         "country": generated_points[0].country,
         "crop": crop_profile.name,
+        "region": generated_points[0].region,
         "best_point": best_point,
         "top_candidates": ranked_points,
         "summary": summary,
         "recommendation": recommendation,
         "ranking_engine": ranking_engine,
     }
+
+
+def _attach_risk_metrics(rows: list[dict[str, Any]]) -> None:
+    for row in rows:
+        frost = float(row.get("frost_risk", 0.0) or 0.0)
+        stress = float(row.get("weather_stress_ratio", 0.0) or 0.0)
+        wind = float(row.get("wind_speed_10m_kmh", 0.0) or 0.0)
+        moisture = row.get("soil_moisture_1_3cm")
+        moisture_val = float(moisture) if moisture is not None else None
+
+        risk_index = (
+            min(1.0, frost * 1.2) * 0.35
+            + min(1.0, stress * 3.0) * 0.35
+            + min(1.0, wind / 35.0) * 0.2
+            + (0.1 if moisture_val is None else min(1.0, abs(0.28 - moisture_val) / 0.28) * 0.1)
+        )
+        risk_index = max(0.0, min(1.0, risk_index))
+        if risk_index < 0.33:
+            risk_level = "low"
+        elif risk_index < 0.66:
+            risk_level = "medium"
+        else:
+            risk_level = "high"
+
+        reasons: list[str] = []
+        if frost > 0.1:
+            reasons.append("elevated frost exposure")
+        if stress > 0.05:
+            reasons.append("frequent severe weather codes")
+        if wind > 20.0:
+            reasons.append("high average wind speed")
+        if moisture_val is not None and (moisture_val < 0.14 or moisture_val > 0.42):
+            reasons.append("surface soil moisture outside ideal range")
+        if not reasons:
+            reasons.append("balanced climate and stress indicators")
+
+        row["risk_index"] = round(risk_index, 3)
+        row["risk_level"] = risk_level
+        row["risk_summary"] = "; ".join(reasons)
 
 
 def _collect_features(
@@ -245,6 +439,7 @@ def _collect_features(
         }
         row.update(weather_features)
         row.update(soil_features)
+        row["nuts_region"] = point.region
         merged_rows.append(row)
     return merged_rows
 

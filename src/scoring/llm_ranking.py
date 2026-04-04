@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import socket
+import time
 import urllib.request
 from typing import Any
 from urllib.error import HTTPError, URLError
@@ -13,6 +15,7 @@ def rank_with_llama3(
     ollama_model: str,
     timeout_seconds: float,
     max_points: int | None = None,
+    extended_reasoning: bool = False,
 ) -> list[dict[str, Any]]:
     if not candidate_rows:
         return []
@@ -35,6 +38,7 @@ def rank_with_llama3(
             endpoint=ollama_endpoint,
             model=ollama_model,
             timeout_seconds=timeout_seconds,
+            extended_reasoning=extended_reasoning,
         )
         for row in to_evaluate
     ]
@@ -52,6 +56,7 @@ def rank_with_llama3(
         endpoint=ollama_endpoint,
         model=ollama_model,
         timeout_seconds=timeout_seconds,
+        extended_reasoning=extended_reasoning,
     )
     return llm_rows
 
@@ -62,15 +67,20 @@ def _evaluate_candidate_with_llm(
     endpoint: str,
     model: str,
     timeout_seconds: float,
+    extended_reasoning: bool,
 ) -> dict[str, Any]:
     enriched = dict(row)
-    llm_eval = _call_ollama_for_candidate(
-        row=row,
-        crop=crop,
-        endpoint=endpoint,
-        model=model,
-        timeout_seconds=timeout_seconds,
-    )
+    try:
+        llm_eval = _call_ollama_for_candidate(
+            row=row,
+            crop=crop,
+            endpoint=endpoint,
+            model=model,
+            timeout_seconds=timeout_seconds,
+            extended_reasoning=extended_reasoning,
+        )
+    except Exception as exc:
+        raise RuntimeError(_humanize_llm_error(exc, model=model, endpoint=endpoint)) from exc
     llm_score = float(llm_eval.get("llm_score", 0.0))
     llm_score = max(0.0, min(100.0, llm_score))
     llm_rating = str(llm_eval.get("rating", _score_band(llm_score))).strip().lower()
@@ -92,6 +102,7 @@ def _call_ollama_for_candidate(
     endpoint: str,
     model: str,
     timeout_seconds: float,
+    extended_reasoning: bool,
 ) -> dict[str, Any]:
     endpoint = endpoint.rstrip("/")
     url = f"{endpoint}/api/generate"
@@ -115,32 +126,30 @@ def _call_ollama_for_candidate(
         "You are an agronomy evaluator. Rate crop suitability for a single location.\n"
         "Return ONLY valid JSON, no markdown.\n"
         'Schema: {"llm_score": number 0-100, "rating": "poor|fair|good|excellent", '
-        '"reasoning": "max 50 words"}\n'
+        f'"reasoning": "max {120 if extended_reasoning else 50} words"}}\n'
         f"Crop: {crop}\n"
         f"Location features: {json.dumps(features, ensure_ascii=True)}\n"
         "Base score only on agronomic weather-soil fit for this crop. "
-        "Mention strongest positive and strongest limiting factor."
+        "Mention strongest positive and strongest limiting factor. "
+        + (
+            "Also mention expected operational risks and mitigation hints."
+            if extended_reasoning
+            else ""
+        )
     )
-    payload = {
-        "model": model,
-        "prompt": prompt,
-        "stream": False,
-        "options": {"temperature": 0},
-    }
-    request = urllib.request.Request(
-        url=url,
-        data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json"},
-        method="POST",
+    model_response = _call_ollama(
+        endpoint=endpoint,
+        model=model,
+        timeout_seconds=timeout_seconds,
+        prompt=prompt,
     )
-    with urllib.request.urlopen(request, timeout=timeout_seconds) as response:
-        raw = json.loads(response.read().decode("utf-8"))
-    model_response = str(raw.get("response", "")).strip()
     parsed = _parse_json_object(model_response)
     return parsed
 
 
 def _parse_json_object(text: str) -> dict[str, Any]:
+    decoder = json.JSONDecoder()
+
     try:
         candidate = json.loads(text)
         if isinstance(candidate, dict):
@@ -148,12 +157,20 @@ def _parse_json_object(text: str) -> dict[str, Any]:
     except json.JSONDecodeError:
         pass
 
-    start = text.find("{")
-    end = text.rfind("}")
-    if start >= 0 and end > start:
-        candidate = json.loads(text[start : end + 1])
-        if isinstance(candidate, dict):
-            return candidate
+    search_start = 0
+    while True:
+        start = text.find("{", search_start)
+        if start < 0:
+            break
+        try:
+            candidate, _end_idx = decoder.raw_decode(text[start:])
+            if isinstance(candidate, dict):
+                return candidate
+        except json.JSONDecodeError:
+            search_start = start + 1
+            continue
+        search_start = start + 1
+
     raise ValueError("Could not parse JSON object from LLM output.")
 
 
@@ -188,6 +205,7 @@ def _attach_selection_reasoning(
     endpoint: str,
     model: str,
     timeout_seconds: float,
+    extended_reasoning: bool,
 ) -> None:
     if len(ranked_rows) < 2:
         return
@@ -212,7 +230,7 @@ def _attach_selection_reasoning(
     prompt = (
         "You are an agronomy evaluator.\n"
         "Explain why the best candidate is better than the next candidates.\n"
-        "Return ONLY valid JSON: {\"selection_reasoning\":\"max 70 words\"}\n"
+        f"Return ONLY valid JSON: {{\"selection_reasoning\":\"max {140 if extended_reasoning else 70} words\"}}\n"
         f"Data: {json.dumps(comparison_payload, ensure_ascii=True)}"
     )
     response = _call_ollama(endpoint, model, timeout_seconds, prompt)
@@ -224,6 +242,11 @@ def _attach_selection_reasoning(
 
 def _humanize_llm_error(exc: Exception, model: str, endpoint: str) -> str:
     prefix = "LLM ranking failed: "
+    if isinstance(exc, (TimeoutError, socket.timeout)):
+        return (
+            f"{prefix}request timed out for model '{model}'. "
+            "Increase LLM_TIMEOUT_SECONDS, reduce LLM_MAX_POINTS, or disable Extended reasoning."
+        )
     if isinstance(exc, HTTPError):
         detail = _read_http_error_detail(exc)
         if exc.code == 404:
@@ -284,15 +307,28 @@ def _call_ollama(
         "stream": False,
         "options": {"temperature": 0},
     }
-    request = urllib.request.Request(
-        url=url,
-        data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
-    with urllib.request.urlopen(request, timeout=timeout_seconds) as response:
-        raw = json.loads(response.read().decode("utf-8"))
-    return str(raw.get("response", "")).strip()
+    last_error: Exception | None = None
+    for attempt in range(2):
+        request = urllib.request.Request(
+            url=url,
+            data=json.dumps(payload).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=timeout_seconds) as response:
+                raw = json.loads(response.read().decode("utf-8"))
+            return str(raw.get("response", "")).strip()
+        except (TimeoutError, socket.timeout, URLError) as exc:
+            last_error = exc
+            if attempt == 0:
+                time.sleep(0.8)
+                continue
+            break
+
+    if last_error is not None:
+        raise last_error
+    raise RuntimeError("Unknown Ollama request error.")
 
 
 def _compact_features(row: dict[str, Any]) -> dict[str, Any]:

@@ -1,0 +1,137 @@
+{
+  "run_id": "run_20260404T214406Z_b9a466",
+  "country": "Romania",
+  "crop": "Corn",
+  "ranking_engine": "rules",
+  "best_point": {
+    "point_id": "P003",
+    "country": "Romania",
+    "lat": 45.054317,
+    "lon": 25.622036,
+    "weather_ok": true,
+    "soil_ok": true,
+    "weather_error": null,
+    "soil_error": null,
+    "mean_temp_c": 6.633,
+    "temp_std_c": 4.487,
+    "frost_risk": 0.017,
+    "rainfall_mm": 1280.42,
+    "humidity_pct": 71.008,
+    "wind_speed_10m_kmh": 7.017,
+    "weather_stress_ratio": 0.0,
+    "soil_ph": 7.14,
+    "clay_pct": 32.6,
+    "soil_organic_carbon_gkg": 26.854,
+    "nuts_region": "Sud-Muntenia",
+    "score": 44.692,
+    "score_band": "fair",
+    "confidence": 0.817,
+    "missing_features": [
+      "et0_mm",
+      "soil_moisture_1_3cm",
+      "sand_pct"
+    ],
+    "hard_violations": [
+      "mean_temp_c"
+    ],
+    "rules_score_before_nuts2": 54.502,
+    "rules_reasoning": "Best-ranked site P003 for Corn scores 44.7% (fair), based on matching weather and soil signals to crop-specific ideal and limit ranges. Confidence reflects how many inputs were present (about 82% here).\n\nWhat looks strong: Soil pH (7.14) is within the ideal band (5.8\u20137.2) for Corn. Frost exposure (1.7% of hours at or below freezing) is within the ideal band (0\u20130.12) for Corn. Soil organic carbon (26.9 g/kg) is within the ideal band (11\u201328) for Corn. Clay content (32.6%) is within the ideal band (12\u201338) for Corn. Relative humidity (71.0%) is within the ideal band (45\u201375) for Corn. Wind speed (7.0 km/h) is within the ideal band (2\u201316) for Corn. Severe-weather stress (0.0% of hours with severe weather codes) is within the ideal band (0\u20130.07) for Corn.\n\nWhat is acceptable but not ideal: Rainfall is 1280 mm (annualized), above the ideal range (450\u2013900) but still inside acceptable bounds (250\u20131300), which can add stress or management needs.\n\nWhat works against the site: Mean temperature is 6.6 \u00b0C, outside the viable range (10\u201335) for Corn (ideal 18\u201327). This heavily penalizes suitability.\n\nData limitations: no values for Reference evapotranspiration (ET0), Surface soil moisture, Sand content. Those gaps reduce confidence and apply a scoring penalty."
+  },
+  "top_candidates": [
+    {
+      "point_id": "P003",
+      "country": "Romania",
+      "lat": 45.054317,
+      "lon": 25.622036,
+      "weather_ok": true,
+      "soil_ok": true,
+      "weather_error": null,
+      "soil_error": null,
+      "mean_temp_c": 6.633,
+      "temp_std_c": 4.487,
+      "frost_risk": 0.017,
+      "rainfall_mm": 1280.42,
+      "humidity_pct": 71.008,
+      "wind_speed_10m_kmh": 7.017,
+      "weather_stress_ratio": 0.0,
+      "soil_ph": 7.14,
+      "clay_pct": 32.6,
+      "soil_organic_carbon_gkg": 26.854,
+      "nuts_region": "Sud-Muntenia",
+      "score": 44.692,
+      "score_band": "fair",
+      "confidence": 0.817,
+      "missing_features": [
+        "et0_mm",
+        "soil_moisture_1_3cm",
+        "sand_pct"
+      ],
+      "hard_violations": [
+        "mean_temp_c"
+      ],
+      "rules_score_before_nuts2": 54.502,
+      "rules_reasoning": "Best-ranked site P003 for Corn scores 44.7% (fair), based on matching weather and soil signals to crop-specific ideal and limit ranges. Confidence reflects how many inputs were present (about 82% here).\n\nWhat looks strong: Soil pH (7.14) is within the ideal band (5.8\u20137.2) for Corn. Frost exposure (1.7% of hours at or below freezing) is within the ideal band (0\u20130.12) for Corn. Soil organic carbon (26.9 g/kg) is within the ideal band (11\u201328) for Corn. Clay content (32.6%) is within the ideal band (12\u201338) for Corn. Relative humidity (71.0%) is within the ideal band (45\u201375) for Corn. Wind speed (7.0 km/h) is within the ideal band (2\u201316) for Corn. Severe-weather stress (0.0% of hours with severe weather codes) is within the ideal band (0\u20130.07) for Corn.\n\nWhat is acceptable but not ideal: Rainfall is 1280 mm (annualized), above the ideal range (450\u2013900) but still inside acceptable bounds (250\u20131300), which can add stress or management needs.\n\nWhat works against the site: Mean temperature is 6.6 \u00b0C, outside the viable range (10\u201335) for Corn (ideal 18\u201327). This heavily penalizes suitability.\n\nData limitations: no values for Reference evapotranspiration (ET0), Surface soil moisture, Sand content. Those gaps reduce confidence and apply a scoring penalty."
+    },
+    {
+      "point_id": "P001",
+      "country": "Romania",
+      "lat": 44.285622,
+      "lon": 26.345366,
+      "weather_ok": true,
+      "soil_ok": true,
+      "weather_error": null,
+      "soil_error": null,
+      "mean_temp_c": 8.881,
+      "temp_std_c": 4.37,
+      "frost_risk": 0.0,
+      "rainfall_mm": 1322.395,
+      "humidity_pct": 71.275,
+      "wind_speed_10m_kmh": 9.479,
+      "weather_stress_ratio": 0.0,
+      "soil_ph": 7.1,
+      "clay_pct": 35.4,
+      "soil_organic_carbon_gkg": 24.998,
+      "nuts_region": "Sud-Muntenia",
+      "score": 37.488,
+      "score_band": "fair",
+      "confidence": 0.747,
+      "missing_features": [
+        "et0_mm",
+        "soil_moisture_1_3cm",
+        "sand_pct"
+      ],
+      "hard_violations": [
+        "mean_temp_c",
+        "rainfall_mm"
+      ],
+      "rules_score_before_nuts2": 45.717
+    }
+  ],
+  "operational_area": {
+    "center_lat": 45.054317,
+    "center_lon": 25.622036,
+    "radius_km": 100.0,
+    "geometry_type": "circle"
+  },
+  "summary": {
+    "total_points": 4,
+    "successful_weather_fetches": 4,
+    "successful_soil_fetches": 4,
+    "points_scored_fully": 4,
+    "points_scored_partially": 4,
+    "elapsed_seconds": {
+      "collect_features": 23.486,
+      "score_and_rank": 0.0
+    },
+    "ranking_engine": "rules",
+    "risk_analysis_enabled": false,
+    "extended_reasoning_enabled": false,
+    "region": "Sud-Muntenia",
+    "nuts2_yield_tons_ha": 2.01,
+    "nuts2_yield_year": 2024,
+    "nuts2_yield_score": 0.0,
+    "nuts2_yield_applied": true,
+    "nuts2_crop_in_file": true
+  },
+  "score_explanation": "Score combines weather and soil fit against crop-specific ideal ranges, then applies calibrated penalties for missing features and hard-threshold violations. Score bands: poor (<40), fair (40-59), good (60-79), excellent (80-100)."
+}

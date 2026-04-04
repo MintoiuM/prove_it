@@ -1,0 +1,78 @@
+{
+  "run_id": "run_20260404T183645Z_742a98",
+  "country": "France",
+  "crop": "wheat",
+  "ranking_engine": "llama3",
+  "best_point": {
+    "point_id": "P001",
+    "country": "France",
+    "lat": 44.425172,
+    "lon": 2.796563,
+    "weather_ok": true,
+    "soil_ok": false,
+    "weather_error": null,
+    "soil_error": "Request failed after retries: HTTP Error 503: Service Temporarily Unavailable",
+    "mean_temp_c": 11.822,
+    "temp_std_c": 7.419,
+    "frost_risk": 0.035,
+    "rainfall_mm": 1152.614,
+    "humidity_pct": 75.844,
+    "wind_speed_10m_kmh": 12.08,
+    "weather_stress_ratio": 0.002,
+    "llm_score": 80.0,
+    "llm_rating": "excellent",
+    "llm_reasoning": "The location's mean temperature is within the optimal range (11-18\u00b0C) for wheat growth, with a low frost risk and adequate rainfall. The soil moisture level is also suitable, but the lack of data on soil pH and organic carbon content may be a limitation.",
+    "decision_source": "llm",
+    "confidence": 0.5,
+    "score": 80.0,
+    "score_band": "excellent"
+  },
+  "top_candidates": [
+    {
+      "point_id": "P001",
+      "country": "France",
+      "lat": 44.425172,
+      "lon": 2.796563,
+      "weather_ok": true,
+      "soil_ok": false,
+      "weather_error": null,
+      "soil_error": "Request failed after retries: HTTP Error 503: Service Temporarily Unavailable",
+      "mean_temp_c": 11.822,
+      "temp_std_c": 7.419,
+      "frost_risk": 0.035,
+      "rainfall_mm": 1152.614,
+      "humidity_pct": 75.844,
+      "wind_speed_10m_kmh": 12.08,
+      "weather_stress_ratio": 0.002,
+      "llm_score": 80.0,
+      "llm_rating": "excellent",
+      "llm_reasoning": "The location's mean temperature is within the optimal range (11-18\u00b0C) for wheat growth, with a low frost risk and adequate rainfall. The soil moisture level is also suitable, but the lack of data on soil pH and organic carbon content may be a limitation.",
+      "decision_source": "llm",
+      "confidence": 0.5,
+      "score": 80.0,
+      "score_band": "excellent"
+    }
+  ],
+  "operational_area": {
+    "center_lat": 44.425172,
+    "center_lon": 2.796563,
+    "radius_km": 100.0,
+    "geometry_type": "circle"
+  },
+  "summary": {
+    "total_points": 10,
+    "successful_weather_fetches": 10,
+    "successful_soil_fetches": 0,
+    "points_scored_fully": 0,
+    "points_scored_partially": 10,
+    "elapsed_seconds": {
+      "collect_features": 30.438,
+      "score_and_rank": 13.103
+    },
+    "ranking_engine": "llama3",
+    "risk_analysis_enabled": false,
+    "extended_reasoning_enabled": false
+  },
+  "score_explanation": "Score combines weather and soil fit against crop-specific ideal ranges, then applies calibrated penalties for missing features and hard-threshold violations. Score bands: poor (<40), fair (40-59), good (60-79), excellent (80-100).",
+  "llm_model": "llama3.2:1b"
+}

@@ -1,0 +1,5 @@
+clay_pct,country,frost_risk,humidity_pct,lat,lon,mean_temp_c,nuts_region,point_id,rainfall_mm,soil_error,soil_ok,soil_organic_carbon_gkg,soil_ph,temp_std_c,weather_error,weather_ok,weather_stress_ratio,wind_speed_10m_kmh
+35.4,Romania,0.0,71.275,44.285622,26.345366,8.881,Sud-Muntenia,P001,1322.395,,True,24.998,7.1,4.37,,True,0.0,9.479
+32.6,Romania,0.325,76.204,45.326298,25.701767,2.595,Sud-Muntenia,P002,1676.08,,True,26.854,7.14,4.068,,True,0.0,8.529
+32.6,Romania,0.017,71.008,45.054317,25.622036,6.633,Sud-Muntenia,P003,1280.42,,True,26.854,7.14,4.487,,True,0.0,7.017
+27.1,Romania,0.479,79.162,45.404336,25.274833,0.746,Sud-Muntenia,P004,1735.21,,True,21.17,6.29,4.266,,True,0.0,7.338

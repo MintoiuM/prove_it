@@ -1,43 +1,25 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+import os
+from pathlib import Path
 
+from src.models.crop_needs_loader import build_profiles_from_csv, normalize_crop_key
+from src.models.crop_schema import CropProfile, FeatureRequirement
 
-@dataclass(frozen=True)
-class FeatureRequirement:
-    ideal_min: float
-    ideal_max: float
-    hard_min: float
-    hard_max: float
-    weight: float
+# Re-export for callers that import from crop_profiles.
+__all__ = (
+    "CropProfile",
+    "FeatureRequirement",
+    "crop_display_labels",
+    "get_crop_profile",
+    "list_crop_names",
+    "reload_crop_profiles",
+)
 
-
-@dataclass(frozen=True)
-class CropProfile:
-    name: str
-    requirements: dict[str, FeatureRequirement]
-
-
-CROP_PROFILES: dict[str, CropProfile] = {
-    "wheat": CropProfile(
-        name="wheat",
-        requirements={
-            "mean_temp_c": FeatureRequirement(10.0, 21.0, 3.0, 30.0, 0.22),
-            "rainfall_mm": FeatureRequirement(350.0, 800.0, 220.0, 1200.0, 0.2),
-            "frost_risk": FeatureRequirement(0.0, 0.25, 0.0, 0.45, 0.1),
-            "humidity_pct": FeatureRequirement(45.0, 72.0, 30.0, 90.0, 0.06),
-            "et0_mm": FeatureRequirement(550.0, 1050.0, 350.0, 1500.0, 0.06),
-            "wind_speed_10m_kmh": FeatureRequirement(3.0, 18.0, 0.0, 35.0, 0.03),
-            "soil_moisture_1_3cm": FeatureRequirement(0.18, 0.38, 0.05, 0.6, 0.03),
-            "weather_stress_ratio": FeatureRequirement(0.0, 0.08, 0.0, 0.3, 0.03),
-            "soil_ph": FeatureRequirement(6.0, 7.4, 5.0, 8.4, 0.2),
-            "soil_organic_carbon_gkg": FeatureRequirement(10.0, 25.0, 4.0, 45.0, 0.14),
-            "clay_pct": FeatureRequirement(15.0, 35.0, 5.0, 55.0, 0.09),
-            "sand_pct": FeatureRequirement(20.0, 55.0, 5.0, 80.0, 0.05),
-        },
-    ),
+# Crops not covered by crop_needs_clean.csv (kept as hand-tuned profiles).
+_BUILTIN_PROFILES: dict[str, CropProfile] = {
     "corn": CropProfile(
-        name="corn",
+        name="Corn",
         requirements={
             "mean_temp_c": FeatureRequirement(18.0, 27.0, 10.0, 35.0, 0.24),
             "rainfall_mm": FeatureRequirement(450.0, 900.0, 250.0, 1300.0, 0.2),
@@ -54,7 +36,7 @@ CROP_PROFILES: dict[str, CropProfile] = {
         },
     ),
     "sunflower": CropProfile(
-        name="sunflower",
+        name="Sunflower",
         requirements={
             "mean_temp_c": FeatureRequirement(16.0, 27.0, 8.0, 34.0, 0.25),
             "rainfall_mm": FeatureRequirement(300.0, 700.0, 180.0, 1100.0, 0.18),
@@ -73,14 +55,55 @@ CROP_PROFILES: dict[str, CropProfile] = {
 }
 
 
+def _resolve_crop_needs_csv_path() -> Path | None:
+    raw = os.getenv("CROP_NEEDS_CSV")
+    if raw is not None:
+        stripped = raw.strip()
+        if not stripped or stripped.lower() in ("none", "off", "0", "false"):
+            return None
+        candidate = Path(stripped)
+        return candidate.resolve() if candidate.is_file() else None
+    candidate = Path("crop_needs_clean.csv")
+    return candidate.resolve() if candidate.is_file() else None
+
+
+def _merged_profiles() -> dict[str, CropProfile]:
+    merged = dict(_BUILTIN_PROFILES)
+    path = _resolve_crop_needs_csv_path()
+    if path is not None:
+        csv_profiles = build_profiles_from_csv(path)
+        merged.update(csv_profiles)
+    return merged
+
+
+_PROFILES_CACHE: dict[str, CropProfile] | None = None
+
+
+def _profiles() -> dict[str, CropProfile]:
+    global _PROFILES_CACHE
+    if _PROFILES_CACHE is None:
+        _PROFILES_CACHE = _merged_profiles()
+    return _PROFILES_CACHE
+
+
+def reload_crop_profiles() -> None:
+    """Clear cached profiles (e.g. after changing CROP_NEEDS_CSV or the file on disk)."""
+    global _PROFILES_CACHE
+    _PROFILES_CACHE = None
+
+
 def list_crop_names() -> list[str]:
-    return sorted(CROP_PROFILES.keys())
+    return sorted(_profiles().keys())
+
+
+def crop_display_labels() -> dict[str, str]:
+    return {key: prof.name for key, prof in _profiles().items()}
 
 
 def get_crop_profile(crop: str) -> CropProfile:
-    key = crop.strip().lower()
-    if key not in CROP_PROFILES:
+    key = normalize_crop_key(crop)
+    profiles = _profiles()
+    if key not in profiles:
         supported = ", ".join(list_crop_names())
         raise ValueError(f"Unsupported crop '{crop}'. Supported crops: {supported}.")
-    return CROP_PROFILES[key]
-
+    return profiles[key]
