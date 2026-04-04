@@ -1,0 +1,85 @@
+{
+  "run_id": "run_20260404T165317Z_fb2384",
+  "country": "France",
+  "crop": "wheat",
+  "ranking_engine": "rules",
+  "best_point": {
+    "point_id": "P001",
+    "country": "France",
+    "lat": 48.574225,
+    "lon": 4.984549,
+    "weather_ok": true,
+    "soil_ok": false,
+    "weather_error": null,
+    "soil_error": "Request failed after retries: HTTP Error 503: Service Temporarily Unavailable",
+    "mean_temp_c": 12.05,
+    "temp_std_c": 7.191,
+    "frost_risk": 0.045,
+    "rainfall_mm": 1183.852,
+    "humidity_pct": 77.843,
+    "wind_speed_10m_kmh": 12.296,
+    "weather_stress_ratio": 0.001,
+    "score": 65.923,
+    "score_band": "good",
+    "confidence": 0.775,
+    "missing_features": [
+      "et0_mm",
+      "soil_moisture_1_3cm",
+      "soil_ph",
+      "soil_organic_carbon_gkg",
+      "clay_pct",
+      "sand_pct"
+    ],
+    "hard_violations": []
+  },
+  "top_candidates": [
+    {
+      "point_id": "P001",
+      "country": "France",
+      "lat": 48.574225,
+      "lon": 4.984549,
+      "weather_ok": true,
+      "soil_ok": false,
+      "weather_error": null,
+      "soil_error": "Request failed after retries: HTTP Error 503: Service Temporarily Unavailable",
+      "mean_temp_c": 12.05,
+      "temp_std_c": 7.191,
+      "frost_risk": 0.045,
+      "rainfall_mm": 1183.852,
+      "humidity_pct": 77.843,
+      "wind_speed_10m_kmh": 12.296,
+      "weather_stress_ratio": 0.001,
+      "score": 65.923,
+      "score_band": "good",
+      "confidence": 0.775,
+      "missing_features": [
+        "et0_mm",
+        "soil_moisture_1_3cm",
+        "soil_ph",
+        "soil_organic_carbon_gkg",
+        "clay_pct",
+        "sand_pct"
+      ],
+      "hard_violations": []
+    }
+  ],
+  "operational_area": {
+    "center_lat": 48.574225,
+    "center_lon": 4.984549,
+    "radius_km": 100.0,
+    "geometry_type": "circle"
+  },
+  "summary": {
+    "total_points": 1,
+    "successful_weather_fetches": 1,
+    "successful_soil_fetches": 0,
+    "points_scored_fully": 0,
+    "points_scored_partially": 1,
+    "elapsed_seconds": {
+      "collect_features": 10.038,
+      "score_and_rank": 0.0
+    },
+    "ranking_engine": "rules"
+  },
+  "score_explanation": "Score combines weather and soil fit against crop-specific ideal ranges, then applies calibrated penalties for missing features and hard-threshold violations. Score bands: poor (<40), fair (40-59), good (60-79), excellent (80-100)."
+}

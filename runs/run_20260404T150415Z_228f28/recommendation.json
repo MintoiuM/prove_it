@@ -1,0 +1,175 @@
+{
+  "run_id": "run_20260404T150415Z_228f28",
+  "country": "Belgium",
+  "crop": "corn",
+  "best_point": {
+    "point_id": "P010",
+    "country": "Belgium",
+    "lat": 49.723861,
+    "lon": 3.055498,
+    "weather_ok": true,
+    "soil_ok": false,
+    "weather_error": null,
+    "soil_error": "Request failed after retries: HTTP Error 503: Service Temporarily Unavailable",
+    "mean_temp_c": 11.953,
+    "temp_std_c": 6.117,
+    "rainfall_mm": 2682.8,
+    "frost_risk": 0.093,
+    "score": 2.605,
+    "confidence": 0.557,
+    "missing_features": [
+      "soil_ph",
+      "soil_organic_carbon_gkg",
+      "clay_pct",
+      "sand_pct"
+    ],
+    "hard_violations": [
+      "rainfall_mm"
+    ]
+  },
+  "top_candidates": [
+    {
+      "point_id": "P010",
+      "country": "Belgium",
+      "lat": 49.723861,
+      "lon": 3.055498,
+      "weather_ok": true,
+      "soil_ok": false,
+      "weather_error": null,
+      "soil_error": "Request failed after retries: HTTP Error 503: Service Temporarily Unavailable",
+      "mean_temp_c": 11.953,
+      "temp_std_c": 6.117,
+      "rainfall_mm": 2682.8,
+      "frost_risk": 0.093,
+      "score": 2.605,
+      "confidence": 0.557,
+      "missing_features": [
+        "soil_ph",
+        "soil_organic_carbon_gkg",
+        "clay_pct",
+        "sand_pct"
+      ],
+      "hard_violations": [
+        "rainfall_mm"
+      ]
+    },
+    {
+      "point_id": "P004",
+      "country": "Belgium",
+      "lat": 51.133712,
+      "lon": 5.872314,
+      "weather_ok": true,
+      "soil_ok": false,
+      "weather_error": null,
+      "soil_error": "Request failed after retries: HTTP Error 503: Service Temporarily Unavailable",
+      "mean_temp_c": 11.926,
+      "temp_std_c": 6.358,
+      "rainfall_mm": 2793.6,
+      "frost_risk": 0.096,
+      "score": 2.461,
+      "confidence": 0.557,
+      "missing_features": [
+        "soil_ph",
+        "soil_organic_carbon_gkg",
+        "clay_pct",
+        "sand_pct"
+      ],
+      "hard_violations": [
+        "rainfall_mm"
+      ]
+    },
+    {
+      "point_id": "P001",
+      "country": "Belgium",
+      "lat": 50.90533,
+      "lon": 2.873766,
+      "weather_ok": true,
+      "soil_ok": false,
+      "weather_error": null,
+      "soil_error": "Request failed after retries: HTTP Error 503: Service Temporarily Unavailable",
+      "mean_temp_c": 11.768,
+      "temp_std_c": 5.669,
+      "rainfall_mm": 2485.6,
+      "frost_risk": 0.072,
+      "score": 1.614,
+      "confidence": 0.557,
+      "missing_features": [
+        "soil_ph",
+        "soil_organic_carbon_gkg",
+        "clay_pct",
+        "sand_pct"
+      ],
+      "hard_violations": [
+        "rainfall_mm"
+      ]
+    },
+    {
+      "point_id": "P002",
+      "country": "Belgium",
+      "lat": 49.767213,
+      "lon": 4.859983,
+      "weather_ok": true,
+      "soil_ok": false,
+      "weather_error": null,
+      "soil_error": "Request failed after retries: HTTP Error 503: Service Temporarily Unavailable",
+      "mean_temp_c": 11.101,
+      "temp_std_c": 6.361,
+      "rainfall_mm": 3439.9,
+      "frost_risk": 0.127,
+      "score": 0.0,
+      "confidence": 0.557,
+      "missing_features": [
+        "soil_ph",
+        "soil_organic_carbon_gkg",
+        "clay_pct",
+        "sand_pct"
+      ],
+      "hard_violations": [
+        "rainfall_mm"
+      ]
+    },
+    {
+      "point_id": "P006",
+      "country": "Belgium",
+      "lat": 50.6475,
+      "lon": 5.739391,
+      "weather_ok": true,
+      "soil_ok": false,
+      "weather_error": null,
+      "soil_error": "Request failed after retries: HTTP Error 503: Service Temporarily Unavailable",
+      "mean_temp_c": 11.202,
+      "temp_std_c": 6.384,
+      "rainfall_mm": 3318.2,
+      "frost_risk": 0.108,
+      "score": 0.0,
+      "confidence": 0.557,
+      "missing_features": [
+        "soil_ph",
+        "soil_organic_carbon_gkg",
+        "clay_pct",
+        "sand_pct"
+      ],
+      "hard_violations": [
+        "rainfall_mm"
+      ]
+    }
+  ],
+  "operational_area": {
+    "center_lat": 49.723861,
+    "center_lon": 3.055498,
+    "radius_km": 100.0,
+    "geometry_type": "circle"
+  },
+  "summary": {
+    "total_points": 10,
+    "successful_weather_fetches": 10,
+    "successful_soil_fetches": 0,
+    "points_scored_fully": 0,
+    "points_scored_partially": 10,
+    "elapsed_seconds": {
+      "collect_features": 109.384,
+      "score_and_rank": 0.0
+    }
+  },
+  "score_explanation": "Score combines weather and soil fit against crop-specific ideal ranges, then applies penalties for missing features and hard-threshold violations."
+}

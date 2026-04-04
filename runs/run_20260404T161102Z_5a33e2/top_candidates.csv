@@ -1,0 +1,2 @@
+confidence,country,decision_source,frost_risk,hard_violations,lat,llm_rating,llm_reasoning,llm_score,lon,mean_temp_c,missing_features,point_id,rainfall_mm,score,score_band,soil_error,soil_ok,temp_std_c,weather_error,weather_ok
+0.673,France,rules-fallback,0.107,"[""rainfall_mm""]",48.574225,fair,Fallback to rules-based score: HTTP Error 500: Internal Server Error,52.451,4.984549,12.049,"[""soil_ph"", ""soil_organic_carbon_gkg"", ""clay_pct"", ""sand_pct""]",P001,3554.8,52.451,fair,Request failed after retries: HTTP Error 503: Service Temporarily Unavailable,False,6.59,,True

@@ -1,0 +1,4 @@
+country,frost_risk,lat,lon,mean_temp_c,point_id,rainfall_mm,soil_error,soil_ok,temp_std_c,weather_error,weather_ok
+France,0.0,47.566383,-4.922338,14.104,P001,3050.0,Request failed after retries: HTTP Error 503: Service Temporarily Unavailable,False,3.057,,True
+France,0.0,43.995287,-1.929518,16.293,P002,3200.9,Request failed after retries: HTTP Error 503: Service Temporarily Unavailable,False,3.971,,True
+France,0.087,48.517418,4.918162,12.381,P003,3321.6,Request failed after retries: HTTP Error 503: Service Temporarily Unavailable,False,6.565,,True

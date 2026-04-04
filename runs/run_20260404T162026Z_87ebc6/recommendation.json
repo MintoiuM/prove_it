@@ -1,0 +1,88 @@
+{
+  "run_id": "run_20260404T162026Z_87ebc6",
+  "country": "France",
+  "crop": "wheat",
+  "ranking_engine": "llama3",
+  "best_point": {
+    "point_id": "P001",
+    "country": "France",
+    "lat": 48.574225,
+    "lon": 4.984549,
+    "weather_ok": true,
+    "soil_ok": false,
+    "weather_error": null,
+    "soil_error": "Request failed after retries: HTTP Error 503: Service Temporarily Unavailable",
+    "mean_temp_c": 12.049,
+    "temp_std_c": 6.59,
+    "rainfall_mm": 3554.8,
+    "frost_risk": 0.107,
+    "score": 52.451,
+    "score_band": "fair",
+    "confidence": 0.673,
+    "missing_features": [
+      "soil_ph",
+      "soil_organic_carbon_gkg",
+      "clay_pct",
+      "sand_pct"
+    ],
+    "hard_violations": [
+      "rainfall_mm"
+    ],
+    "llm_score": 52.451,
+    "llm_rating": "fair",
+    "llm_reasoning": "Fallback to rules-based score: Ollama server error (500) while using model 'llama3'. Try: ollama serve, then ollama pull llama3. Details: {\"error\":\"model requires more system memory (4.6 GiB) than is available (3.4 GiB)\"}",
+    "decision_source": "rules-fallback"
+  },
+  "top_candidates": [
+    {
+      "point_id": "P001",
+      "country": "France",
+      "lat": 48.574225,
+      "lon": 4.984549,
+      "weather_ok": true,
+      "soil_ok": false,
+      "weather_error": null,
+      "soil_error": "Request failed after retries: HTTP Error 503: Service Temporarily Unavailable",
+      "mean_temp_c": 12.049,
+      "temp_std_c": 6.59,
+      "rainfall_mm": 3554.8,
+      "frost_risk": 0.107,
+      "score": 52.451,
+      "score_band": "fair",
+      "confidence": 0.673,
+      "missing_features": [
+        "soil_ph",
+        "soil_organic_carbon_gkg",
+        "clay_pct",
+        "sand_pct"
+      ],
+      "hard_violations": [
+        "rainfall_mm"
+      ],
+      "llm_score": 52.451,
+      "llm_rating": "fair",
+      "llm_reasoning": "Fallback to rules-based score: Ollama server error (500) while using model 'llama3'. Try: ollama serve, then ollama pull llama3. Details: {\"error\":\"model requires more system memory (4.6 GiB) than is available (3.4 GiB)\"}",
+      "decision_source": "rules-fallback"
+    }
+  ],
+  "operational_area": {
+    "center_lat": 48.574225,
+    "center_lon": 4.984549,
+    "radius_km": 100.0,
+    "geometry_type": "circle"
+  },
+  "summary": {
+    "total_points": 1,
+    "successful_weather_fetches": 1,
+    "successful_soil_fetches": 0,
+    "points_scored_fully": 0,
+    "points_scored_partially": 1,
+    "elapsed_seconds": {
+      "collect_features": 9.629,
+      "score_and_rank": 0.443
+    },
+    "ranking_engine": "llama3"
+  },
+  "score_explanation": "Score combines weather and soil fit against crop-specific ideal ranges, then applies calibrated penalties for missing features and hard-threshold violations. Score bands: poor (<40), fair (40-59), good (60-79), excellent (80-100).",
+  "llm_model": "llama3"
+}

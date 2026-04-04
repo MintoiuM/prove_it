@@ -1,0 +1,175 @@
+{
+  "run_id": "run_20260404T145955Z_f3d6aa",
+  "country": "Romania",
+  "crop": "corn",
+  "best_point": {
+    "point_id": "P001",
+    "country": "Romania",
+    "lat": 44.102094,
+    "lon": 26.944821,
+    "weather_ok": true,
+    "soil_ok": false,
+    "weather_error": null,
+    "soil_error": "Request failed after retries: HTTP Error 503: Service Temporarily Unavailable",
+    "mean_temp_c": 13.782,
+    "temp_std_c": 9.041,
+    "rainfall_mm": 1846.1,
+    "frost_risk": 0.137,
+    "score": 10.38,
+    "confidence": 0.557,
+    "missing_features": [
+      "soil_ph",
+      "soil_organic_carbon_gkg",
+      "clay_pct",
+      "sand_pct"
+    ],
+    "hard_violations": [
+      "rainfall_mm"
+    ]
+  },
+  "top_candidates": [
+    {
+      "point_id": "P001",
+      "country": "Romania",
+      "lat": 44.102094,
+      "lon": 26.944821,
+      "weather_ok": true,
+      "soil_ok": false,
+      "weather_error": null,
+      "soil_error": "Request failed after retries: HTTP Error 503: Service Temporarily Unavailable",
+      "mean_temp_c": 13.782,
+      "temp_std_c": 9.041,
+      "rainfall_mm": 1846.1,
+      "frost_risk": 0.137,
+      "score": 10.38,
+      "confidence": 0.557,
+      "missing_features": [
+        "soil_ph",
+        "soil_organic_carbon_gkg",
+        "clay_pct",
+        "sand_pct"
+      ],
+      "hard_violations": [
+        "rainfall_mm"
+      ]
+    },
+    {
+      "point_id": "P005",
+      "country": "Romania",
+      "lat": 45.024043,
+      "lon": 26.768638,
+      "weather_ok": true,
+      "soil_ok": false,
+      "weather_error": null,
+      "soil_error": "Request failed after retries: HTTP Error 503: Service Temporarily Unavailable",
+      "mean_temp_c": 13.333,
+      "temp_std_c": 9.259,
+      "rainfall_mm": 1723.0,
+      "frost_risk": 0.198,
+      "score": 0.712,
+      "confidence": 0.557,
+      "missing_features": [
+        "soil_ph",
+        "soil_organic_carbon_gkg",
+        "clay_pct",
+        "sand_pct"
+      ],
+      "hard_violations": [
+        "rainfall_mm"
+      ]
+    },
+    {
+      "point_id": "P002",
+      "country": "Romania",
+      "lat": 46.664597,
+      "lon": 29.227383,
+      "weather_ok": true,
+      "soil_ok": false,
+      "weather_error": null,
+      "soil_error": "Request failed after retries: HTTP Error 503: Service Temporarily Unavailable",
+      "mean_temp_c": 12.378,
+      "temp_std_c": 9.306,
+      "rainfall_mm": 1618.3,
+      "frost_risk": 0.203,
+      "score": 0.0,
+      "confidence": 0.557,
+      "missing_features": [
+        "soil_ph",
+        "soil_organic_carbon_gkg",
+        "clay_pct",
+        "sand_pct"
+      ],
+      "hard_violations": [
+        "rainfall_mm"
+      ]
+    },
+    {
+      "point_id": "P003",
+      "country": "Romania",
+      "lat": 44.874242,
+      "lon": 22.655445,
+      "weather_ok": true,
+      "soil_ok": false,
+      "weather_error": null,
+      "soil_error": "Request failed after retries: HTTP Error 503: Service Temporarily Unavailable",
+      "mean_temp_c": 10.754,
+      "temp_std_c": 8.497,
+      "rainfall_mm": 2585.5,
+      "frost_risk": 0.224,
+      "score": 0.0,
+      "confidence": 0.557,
+      "missing_features": [
+        "soil_ph",
+        "soil_organic_carbon_gkg",
+        "clay_pct",
+        "sand_pct"
+      ],
+      "hard_violations": [
+        "rainfall_mm"
+      ]
+    },
+    {
+      "point_id": "P004",
+      "country": "Romania",
+      "lat": 47.050079,
+      "lon": 26.52112,
+      "weather_ok": true,
+      "soil_ok": false,
+      "weather_error": null,
+      "soil_error": "Request failed after retries: HTTP Error 503: Service Temporarily Unavailable",
+      "mean_temp_c": 10.446,
+      "temp_std_c": 8.879,
+      "rainfall_mm": 1899.8,
+      "frost_risk": 0.276,
+      "score": 0.0,
+      "confidence": 0.557,
+      "missing_features": [
+        "soil_ph",
+        "soil_organic_carbon_gkg",
+        "clay_pct",
+        "sand_pct"
+      ],
+      "hard_violations": [
+        "rainfall_mm"
+      ]
+    }
+  ],
+  "operational_area": {
+    "center_lat": 44.102094,
+    "center_lon": 26.944821,
+    "radius_km": 100.0,
+    "geometry_type": "circle"
+  },
+  "summary": {
+    "total_points": 5,
+    "successful_weather_fetches": 5,
+    "successful_soil_fetches": 0,
+    "points_scored_fully": 0,
+    "points_scored_partially": 5,
+    "elapsed_seconds": {
+      "collect_features": 53.86,
+      "score_and_rank": 0.0
+    }
+  },
+  "score_explanation": "Score combines weather and soil fit against crop-specific ideal ranges, then applies penalties for missing features and hard-threshold violations."
+}

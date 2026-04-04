@@ -1,0 +1,6 @@
+country,frost_risk,lat,lon,mean_temp_c,point_id,rainfall_mm,soil_error,soil_ok,temp_std_c,weather_error,weather_ok
+Romania,0.137,44.102094,26.944821,13.782,P001,1846.1,Request failed after retries: HTTP Error 503: Service Temporarily Unavailable,False,9.041,,True
+Romania,0.203,46.664597,29.227383,12.378,P002,1618.3,Request failed after retries: HTTP Error 503: Service Temporarily Unavailable,False,9.306,,True
+Romania,0.224,44.874242,22.655445,10.754,P003,2585.5,Request failed after retries: HTTP Error 503: Service Temporarily Unavailable,False,8.497,,True
+Romania,0.276,47.050079,26.52112,10.446,P004,1899.8,Request failed after retries: HTTP Error 503: Service Temporarily Unavailable,False,8.879,,True
+Romania,0.198,45.024043,26.768638,13.333,P005,1723.0,Request failed after retries: HTTP Error 503: Service Temporarily Unavailable,False,9.259,,True

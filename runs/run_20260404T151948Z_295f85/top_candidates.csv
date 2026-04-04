@@ -1,0 +1,4 @@
+confidence,country,frost_risk,hard_violations,lat,lon,mean_temp_c,missing_features,point_id,rainfall_mm,score,score_band,soil_error,soil_ok,temp_std_c,weather_error,weather_ok
+0.743,France,0.063,[],43.533381,3.747154,15.747,"[""soil_ph"", ""soil_organic_carbon_gkg"", ""clay_pct"", ""sand_pct""]",P004,535.9,93.143,excellent,Request failed after retries: HTTP Error 503: Service Temporarily Unavailable,False,7.036,,True
+0.743,France,0.093,[],47.728402,3.119861,12.512,"[""soil_ph"", ""soil_organic_carbon_gkg"", ""clay_pct"", ""sand_pct""]",P003,906.0,84.479,excellent,Request failed after retries: HTTP Error 503: Service Temporarily Unavailable,False,6.782,,True
+0.743,France,0.126,[],49.251652,5.287974,11.467,"[""soil_ph"", ""soil_organic_carbon_gkg"", ""clay_pct"", ""sand_pct""]",P005,1179.2,62.151,good,Request failed after retries: HTTP Error 503: Service Temporarily Unavailable,False,6.688,,True

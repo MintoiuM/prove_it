@@ -1,0 +1,11 @@
+country,frost_risk,humidity_pct,lat,lon,mean_temp_c,point_id,rainfall_mm,soil_error,soil_ok,temp_std_c,weather_error,weather_ok,weather_stress_ratio,wind_speed_10m_kmh
+Belgium,0.042,78.295,50.900397,4.88339,11.784,P001,908.837,Request failed after retries: HTTP Error 503: Service Temporarily Unavailable,False,6.832,,True,0.001,12.972
+Belgium,0.042,78.723,50.817065,4.634784,11.671,P002,872.969,Request failed after retries: HTTP Error 503: Service Temporarily Unavailable,False,6.737,,True,0.001,13.452
+Belgium,0.05,79.534,50.430887,4.799859,11.226,P003,918.628,Request failed after retries: HTTP Error 503: Service Temporarily Unavailable,False,6.749,,True,0.001,13.701
+Belgium,0.043,78.027,50.948498,4.968144,11.83,P004,932.748,Request failed after retries: HTTP Error 503: Service Temporarily Unavailable,False,6.873,,True,0.001,12.751
+Belgium,0.025,80.455,51.159407,2.881879,11.731,P005,874.834,Request failed after retries: HTTP Error 503: Service Temporarily Unavailable,False,6.035,,True,0.001,15.079
+Belgium,0.061,80.878,50.384835,5.304819,10.557,P006,1008.379,Request failed after retries: HTTP Error 503: Service Temporarily Unavailable,False,6.769,,True,0.002,14.7
+Belgium,0.05,78.571,50.682015,5.447239,11.353,P007,992.494,Request failed after retries: HTTP Error 503: Service Temporarily Unavailable,False,6.869,,True,0.002,13.745
+Belgium,0.051,78.493,50.591037,5.515268,11.271,P008,1028.927,Request failed after retries: HTTP Error 503: Service Temporarily Unavailable,False,6.886,,True,0.002,13.451
+Belgium,0.057,81.058,50.196791,4.718709,10.772,P009,930.384,Request failed after retries: HTTP Error 503: Service Temporarily Unavailable,False,6.744,,True,0.001,13.5
+Belgium,0.032,79.437,51.114705,3.486372,11.759,P010,905.606,Request failed after retries: HTTP Error 503: Service Temporarily Unavailable,False,6.511,,True,0.001,13.95

@@ -1,0 +1,100 @@
+{
+  "run_id": "run_20260404T142151Z_9aa564",
+  "country": "France",
+  "crop": "wheat",
+  "best_point": {
+    "point_id": "P001",
+    "country": "France",
+    "lat": 47.566383,
+    "lon": -4.922338,
+    "weather_ok": true,
+    "soil_ok": false,
+    "weather_error": null,
+    "soil_error": "Request failed after retries: HTTP Error 503: Service Temporarily Unavailable",
+    "mean_temp_c": 14.104,
+    "temp_std_c": 3.057,
+    "rainfall_mm": 3050.0,
+    "frost_risk": 0.0,
+    "score": 32.253,
+    "confidence": 0.557,
+    "missing_features": [
+      "soil_ph",
+      "soil_organic_carbon_gkg",
+      "clay_pct",
+      "sand_pct"
+    ],
+    "hard_violations": [
+      "rainfall_mm"
+    ]
+  },
+  "top_candidates": [
+    {
+      "point_id": "P001",
+      "country": "France",
+      "lat": 47.566383,
+      "lon": -4.922338,
+      "weather_ok": true,
+      "soil_ok": false,
+      "weather_error": null,
+      "soil_error": "Request failed after retries: HTTP Error 503: Service Temporarily Unavailable",
+      "mean_temp_c": 14.104,
+      "temp_std_c": 3.057,
+      "rainfall_mm": 3050.0,
+      "frost_risk": 0.0,
+      "score": 32.253,
+      "confidence": 0.557,
+      "missing_features": [
+        "soil_ph",
+        "soil_organic_carbon_gkg",
+        "clay_pct",
+        "sand_pct"
+      ],
+      "hard_violations": [
+        "rainfall_mm"
+      ]
+    },
+    {
+      "point_id": "P002",
+      "country": "France",
+      "lat": 43.995287,
+      "lon": -1.929518,
+      "weather_ok": true,
+      "soil_ok": false,
+      "weather_error": null,
+      "soil_error": "Request failed after retries: HTTP Error 503: Service Temporarily Unavailable",
+      "mean_temp_c": 16.293,
+      "temp_std_c": 3.971,
+      "rainfall_mm": 3200.9,
+      "frost_risk": 0.0,
+      "score": 32.253,
+      "confidence": 0.557,
+      "missing_features": [
+        "soil_ph",
+        "soil_organic_carbon_gkg",
+        "clay_pct",
+        "sand_pct"
+      ],
+      "hard_violations": [
+        "rainfall_mm"
+      ]
+    }
+  ],
+  "operational_area": {
+    "center_lat": 47.566383,
+    "center_lon": -4.922338,
+    "radius_km": 100.0,
+    "geometry_type": "circle"
+  },
+  "summary": {
+    "total_points": 3,
+    "successful_weather_fetches": 3,
+    "successful_soil_fetches": 0,
+    "points_scored_fully": 0,
+    "points_scored_partially": 2,
+    "elapsed_seconds": {
+      "collect_features": 33.126,
+      "score_and_rank": 0.0
+    }
+  },
+  "score_explanation": "Score combines weather and soil fit against crop-specific ideal ranges, then applies penalties for missing features and hard-threshold violations."
+}

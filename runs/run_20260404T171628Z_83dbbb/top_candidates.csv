@@ -1,0 +1,2 @@
+confidence,country,frost_risk,hard_violations,humidity_pct,lat,lon,mean_temp_c,missing_features,point_id,rainfall_mm,score,score_band,soil_error,soil_ok,temp_std_c,weather_error,weather_ok,weather_stress_ratio,wind_speed_10m_kmh
+0.775,France,0.045,[],77.843,48.574225,4.984549,12.05,"[""et0_mm"", ""soil_moisture_1_3cm"", ""soil_ph"", ""soil_organic_carbon_gkg"", ""clay_pct"", ""sand_pct""]",P001,1183.852,65.923,good,Request failed after retries: HTTP Error 503: Service Temporarily Unavailable,False,7.191,,True,0.001,12.296
