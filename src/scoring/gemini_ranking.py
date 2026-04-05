@@ -235,4 +235,23 @@ def _humanize_gemini_error(exc: Exception, model: str) -> str:
             "Increase LLM_TIMEOUT_SECONDS or reduce LLM_MAX_POINTS."
         )
     text = str(exc).strip() or "Unknown error."
+    low = text.lower()
+    if "api key not valid" in low or ("400" in text and "api key" in low):
+        return (
+            f"{prefix}{text}\n\n"
+            "The server rejected the API key. Fix: use a key from Google AI Studio (Generative Language API), "
+            "put it in GEMINI_API_KEY in the project’s .env at the repo root (or set DOTENV_PATH), "
+            "avoid pasting a Maps-only key, remove spaces/newlines, and restart the web app. "
+            "Optional: GEMINI_API_KEY_FILE=/path/to/key.txt"
+        )
+    if "403" in text or "permission" in low:
+        return (
+            f"{prefix}{text}\n\n"
+            "Enable the Generative Language API for the Google Cloud project that owns this API key."
+        )
+    if "404" in text and "model" in low:
+        return (
+            f"{prefix}{text}\n\n"
+            f"Try GEMINI_MODEL=gemini-2.0-flash or gemini-1.5-flash — '{model}' may be unavailable for this key."
+        )
     return f"{prefix}{text}"

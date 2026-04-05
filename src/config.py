@@ -5,21 +5,52 @@ from dataclasses import dataclass
 from datetime import date, timedelta
 from pathlib import Path
 
+# Repo root (parent of `src/`) so .env is found even if the process cwd is elsewhere.
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent
+
+
+def _dotenv_paths() -> list[Path]:
+    """Order: explicit path, project root, then current working directory."""
+    paths: list[Path] = []
+    env_path = os.getenv("DOTENV_PATH", "").strip()
+    if env_path:
+        paths.append(Path(env_path).expanduser())
+    paths.append(_PROJECT_ROOT / ".env")
+    paths.append(Path.cwd() / ".env")
+    return paths
+
+
+def _parse_dotenv_value(raw: str) -> str:
+    value = raw.strip().strip('"').strip("'")
+    if "#" in value and not (raw.strip().startswith('"') or raw.strip().startswith("'")):
+        value = value.split("#", 1)[0].rstrip()
+    return value.strip().strip('"').strip("'")
+
+
+def _sanitize_gemini_api_key(raw: str) -> str:
+    s = raw.strip().replace("\ufeff", "").replace("\r", "").replace("\n", "")
+    return s.strip()
+
 
 def _load_dotenv_if_present(override: bool = False) -> None:
-    dotenv_path = Path(".env")
-    if not dotenv_path.exists():
-        return
-    for raw_line in dotenv_path.read_text(encoding="utf-8").splitlines():
-        line = raw_line.strip()
-        if not line or line.startswith("#") or "=" not in line:
+    for dotenv_path in _dotenv_paths():
+        if not dotenv_path.is_file():
             continue
-        key, value = line.split("=", 1)
-        key = key.strip()
-        value = value.strip().strip('"').strip("'")
-        if key:
-            if override or key not in os.environ:
-                os.environ[key] = value
+        try:
+            text = dotenv_path.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        for raw_line in text.splitlines():
+            line = raw_line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            key = key.strip()
+            value = _parse_dotenv_value(value)
+            if key:
+                if override or key not in os.environ:
+                    os.environ[key] = value
+        break
 
 _load_dotenv_if_present(override=False)
 
@@ -130,7 +161,18 @@ class Settings:
         # Reload .env on each read so web app picks up edits without restart.
         _load_dotenv_if_present(override=True)
         default_start, default_end = _default_date_range()
-        _gemini_raw = os.getenv("GEMINI_API_KEY", "").strip()
+        _gemini_raw = _sanitize_gemini_api_key(os.getenv("GEMINI_API_KEY", ""))
+        if not _gemini_raw:
+            _kf = os.getenv("GEMINI_API_KEY_FILE", "").strip()
+            if _kf:
+                _kp = Path(_kf).expanduser()
+                if _kp.is_file():
+                    try:
+                        _gemini_raw = _sanitize_gemini_api_key(
+                            _kp.read_text(encoding="utf-8")
+                        )
+                    except OSError:
+                        pass
         gemini_api_key = _gemini_raw if _gemini_raw else None
         _llm_explicit = os.getenv("LLM_PROVIDER", "").strip().lower()
         if _llm_explicit in ("ollama", "gemini"):
