@@ -5,11 +5,13 @@ import socket
 import urllib.request
 from typing import Any
 from urllib.error import HTTPError, URLError
+from urllib.parse import quote
 
 from src.scoring.llm_ranking import (
     _compact_features,
     _data_confidence,
     _parse_json_object,
+    _row_features_for_prompt,
     _score_band,
 )
 
@@ -97,22 +99,7 @@ def _evaluate_candidate_with_gemini(
 def _candidate_eval_prompt(
     row: dict[str, Any], crop: str, extended_reasoning: bool
 ) -> str:
-    features = {
-        "lat": row.get("lat"),
-        "lon": row.get("lon"),
-        "mean_temp_c": row.get("mean_temp_c"),
-        "rainfall_mm": row.get("rainfall_mm"),
-        "frost_risk": row.get("frost_risk"),
-        "humidity_pct": row.get("humidity_pct"),
-        "et0_mm": row.get("et0_mm"),
-        "wind_speed_10m_kmh": row.get("wind_speed_10m_kmh"),
-        "soil_moisture_1_3cm": row.get("soil_moisture_1_3cm"),
-        "weather_stress_ratio": row.get("weather_stress_ratio"),
-        "soil_ph": row.get("soil_ph"),
-        "soil_organic_carbon_gkg": row.get("soil_organic_carbon_gkg"),
-        "sand_pct": row.get("sand_pct"),
-        "clay_pct": row.get("clay_pct"),
-    }
+    features = _row_features_for_prompt(row)
     return (
         "You are an agronomy evaluator. Rate crop suitability for a single location.\n"
         "Return ONLY valid JSON, no markdown.\n"
@@ -197,7 +184,7 @@ def _call_gemini_raw(
 ) -> str:
     url = (
         "https://generativelanguage.googleapis.com/v1beta/models/"
-        f"{model}:generateContent?key={api_key}"
+        f"{model}:generateContent?key={quote(api_key, safe='')}"
     )
     body: dict[str, Any] = {
         "contents": [{"role": "user", "parts": [{"text": prompt}]}],
@@ -243,6 +230,11 @@ def _humanize_gemini_error(exc: Exception, model: str) -> str:
             "put it in GEMINI_API_KEY in the project’s .env at the repo root (or set DOTENV_PATH), "
             "avoid pasting a Maps-only key, remove spaces/newlines, and restart the web app. "
             "Optional: GEMINI_API_KEY_FILE=/path/to/key.txt"
+        )
+    if "429" in text or "resource exhausted" in low or "quota" in low:
+        return (
+            f"{prefix}{text}\n\n"
+            "Rate limited: wait and retry, reduce LLM_MAX_POINTS, or check quota on the API key."
         )
     if "403" in text or "permission" in low:
         return (

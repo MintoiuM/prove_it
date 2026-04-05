@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
+from src.config import resolve_bundled_data_csv
 from src.models.crop_needs_loader import build_profiles_from_csv, normalize_crop_key
 from src.models.crop_schema import CropProfile, FeatureRequirement
 
@@ -63,8 +64,7 @@ def _resolve_crop_needs_csv_path() -> Path | None:
             return None
         candidate = Path(stripped)
         return candidate.resolve() if candidate.is_file() else None
-    candidate = Path("crop_needs_clean.csv")
-    return candidate.resolve() if candidate.is_file() else None
+    return resolve_bundled_data_csv("crop_needs_clean.csv")
 
 
 def _merged_profiles() -> dict[str, CropProfile]:

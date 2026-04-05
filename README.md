@@ -1,77 +1,122 @@
 # Europe Crop Suitability MVP
 
-Runnable MVP for selecting high-suitability cultivation points inside a supported European country.
+Runnable tool for ranking candidate cultivation sites inside supported European countries: sample points, pull weather and soil signals, score agronomic fit, and export a shortlist with diagnostics.
 
 ## What it does
 
-- Accepts `country` and `crop` as inputs.
-- Generates 100 deterministic candidate points.
-- Collects weather features from Open-Meteo.
-- Collects soil features from SoilGrids.
-- Computes suitability score `[0, 100]` with confidence.
-- Optionally uses local Llama 3 (Ollama) to reason and rerank candidates.
-- Exports ranked recommendations and run diagnostics.
+- Samples a configurable number of deterministic candidate points per country (and optional NUTS-style sub-region).
+- **Land-only sampling:** after country (and optional NUTS) polygon checks, points must lie on a **Natural Earth land** layer (default **`ne_50m_land`** — `ne_110m_land` bridges narrow seas and is not used by default). Country outlines prefer **`ne_50m_admin_0_countries`**, falling back to 110m. Override land detail with **`NATURAL_EARTH_LAND_RESOLUTION=10`** for `ne_10m_land` (~10 MB) if you still see coastal artefacts. Files cache under `.cache/boundaries/`; if download fails, a warning is issued and sampling falls back to country polygons only.
+- **Weather:** Open-Meteo archive by default; optional **Google Maps** forecast window when `GOOGLE_MAPS_API_KEY` is set (see `.env.example`).
+- **Soil:** SoilGrids API and/or bundled **`datasets/europe_soil_climate_dataset.csv`** (nearest-neighbour rows) when configured.
+- Scores each site with rule-based suitability `[0, 100]`, confidence, and optional **risk** metrics (`--risk-analysis`).
+- Optional **NUTS2 regional yields** and **land buy-out / rent** estimates from bundled CSVs under `datasets/` when those files are present.
+- Optional **Google Gemini** reranking of the top `LLM_MAX_POINTS` candidates after rules ordering (`--use-llm`, needs `GEMINI_API_KEY`).
+- Writes **`runs/<run_id>/`** CSV + JSON artifacts; optional Open-Meteo archive cross-check for top sites (see `OPEN_METEO_VALIDATION` in `.env.example`).
+
+## Requirements
+
+- **Python 3.10+** (3.11+ recommended).
+- Run commands from the **repository root** (or set `DOTENV_PATH` so `.env` is found—loading also checks the repo root next to `src/`).
 
 ## Quick start
 
-1. Create and activate a Python virtual environment.
-2. Copy environment defaults:
-
 ```bash
+python3 -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
 cp .env.example .env
+python3 -m src.main --country France --crop wheat --demo-safe
 ```
 
-3. Run demo:
+The pipeline uses the Python standard library only (no `pip install` required for core runs).
+
+## Tests
+
+Install the dev dependency (once per venv), then run **pytest** from the repo root:
 
 ```bash
-python -m src.main --country France --crop wheat --demo-safe
+pip install -r requirements-dev.txt
+python3 -m pytest
 ```
 
-Run with Llama 3 thinker mode (optional):
+Verbose output: `python3 -m pytest -v`. One file: `python3 -m pytest tests/test_suitability.py`.
+
+Tests cover rule scoring, LLM JSON helpers (no API calls), bundled CSV path resolution, and NUTS2 helpers. They require **`datasets/crop_needs_clean.csv`** (and for the NUTS2 smoke test, **`datasets/nuts2_crop_yields_all_regions.csv`**) to be present as in this repo.
+
+Gemini reranking (after setting `GEMINI_API_KEY` in `.env`):
 
 ```bash
-python -m src.main --country France --crop wheat --demo-safe --use-llm
+python3 -m src.main --country France --crop wheat --demo-safe --use-llm
+```
+
+## Configuration
+
+Environment variables are documented in **`.env.example`**. Notable groups:
+
+| Area | Examples |
+|------|----------|
+| Weather / soil APIs | `WEATHER_ENDPOINT`, `SOIL_ENDPOINT`, `WEATHER_PROVIDER`, `SOIL_DATASET_CSV` |
+| Bundled CSV overrides | `CROP_NEEDS_CSV`, `NUTS2_YIELDS_CSV`, `LAND_PRICES_CSV` |
+| HTTP pacing | `REQUEST_*`, `WEATHER_WORKERS`, `SOIL_MIN_INTERVAL_SECONDS`, `FAILURE_ABORT_RATIO` |
+| LLM | `GEMINI_API_KEY`, `GEMINI_API_KEY_FILE`, `GEMINI_MODEL`, `LLM_MAX_POINTS`, `LLM_TIMEOUT_SECONDS` |
+| Maps UI | `GOOGLE_MAPS_API_KEY` (Leaflet map in the web app) |
+
+Default bundled data files are resolved from **`datasets/`** first, then the repo root (legacy layout).
+
+## CLI
+
+```text
+python3 -m src.main --country <name> --crop <slug> [options]
+```
+
+| Option | Role |
+|--------|------|
+| `--points`, `--seed`, `--top-n` | Sample size, RNG seed, shortlist length |
+| `--start-date`, `--end-date` | Weather window (defaults: rolling ~3 years) |
+| `--demo-safe` | Slower, gentler throttling for live demos |
+| `--region` | Optional NUTS label for regional yield blending (see NUTS2 CSV) |
+| `--use-llm` | Gemini rescores top slice (requires API key) |
+| `--risk-analysis` | Adds computed risk fields per candidate |
+| `--extended-reasoning` | Longer LLM explanations when `--use-llm` is on |
+
+Crop choices are defined by **`datasets/crop_needs_clean.csv`** when present, plus built-in profiles (e.g. corn, sunflower). List valid `--crop` values with:
+
+```bash
+python3 -m src.main --help
 ```
 
 ## Web application UI
 
-Run the browser UI:
-
 ```bash
-python -m src.webapp --host 127.0.0.1 --port 8080
+python3 -m src.web --host 127.0.0.1 --port 8080
 ```
 
-Then open:
+Then open `http://127.0.0.1:8080`. The same server is available as **`python3 -m src.webapp`** (compatibility shim).
 
-- `http://127.0.0.1:8080`
+Enable **AI recommendations** in the UI for Gemini-based scoring when a key is configured.
 
-The UI lets you insert country/crop/points/top-N/seed and run the analysis directly from the page.
-Enable **Use Llama 3 reasoning** in the UI to use LLM-based candidate rating.
+## Project layout
 
-## Llama 3 setup (optional)
+| Path | Purpose |
+|------|---------|
+| `src/main.py` | CLI entry; orchestrates the pipeline |
+| `src/web/` | HTTP server and `templates/site_provit.html` |
+| `src/collectors/` | Weather, soil, HTTP client, Open-Meteo validation helpers |
+| `src/geo/` | Country envelopes, point sampling, NUTS helpers |
+| `src/models/` | Crop profiles and CSV-backed crop needs |
+| `src/scoring/` | Rules engine, Gemini integration, shared LLM JSON helpers |
+| `src/data/` | Land price and NUTS2 yield stores |
+| `src/output/` | Run directory layout, CSV/JSON export, reasoning text |
+| `datasets/` | Bundled CSV inputs (crop needs, optional soil/yields/land) |
+| `runs/` | Per-run outputs (created at runtime) |
+| `.cache/` | HTTP response cache (created at runtime) |
 
-Install and run Ollama locally, then pull a model:
+More architecture and data-model detail: **`TECHNICAL_DOCUMENTATION.md`**.
 
-```bash
-ollama serve
-ollama pull llama3
-```
+## Gemini (optional)
 
-Default config uses:
-- endpoint: `http://127.0.0.1:11434`
-- model: `llama3`
-
-You can customize with `.env`:
-- `OLLAMA_ENDPOINT`
-- `OLLAMA_MODEL`
-- `LLM_TIMEOUT_SECONDS`
-- `LLM_MAX_POINTS`
-
-## Supported crops
-
-- `wheat`
-- `corn`
-- `sunflower`
+1. Create a key in [Google AI Studio](https://aistudio.google.com/).
+2. Enable the **Generative Language API** for the Google Cloud project tied to that key.
+3. Set `GEMINI_API_KEY` or `GEMINI_API_KEY_FILE` in `.env`; tune `GEMINI_MODEL`, `LLM_TIMEOUT_SECONDS`, and `LLM_MAX_POINTS` as needed.
 
 ## Supported countries (MVP catalog)
 
@@ -79,24 +124,21 @@ France, Spain, Italy, Germany, Romania, Poland, Netherlands, Belgium, Portugal, 
 
 ## Output artifacts
 
-Each run writes into `runs/<run_id>/`:
+Each run writes under **`runs/<run_id>/`**:
 
-- `candidates.csv`: merged feature table for sampled points
-- `top_candidates.csv`: ranked shortlist
-- `recommendation.json`: best point, top candidates, score explanation, diagnostics
+- **`candidates.csv`** — full feature table for sampled points  
+- **`top_candidates.csv`** — ranked shortlist  
+- **`recommendation.json`** — best point, top candidates, summary metadata  
 
-## Judge-friendly one-command demo
+## One-command demo
 
 ```bash
-python -m src.main --country France --crop wheat --points 100 --seed 42 --top-n 10 --demo-safe
+python3 -m src.main --country France --crop wheat --points 100 --seed 42 --top-n 10 --demo-safe
 ```
 
-This mode applies conservative request pacing and low concurrency for safer live demo execution.
+## Reliability
 
-## Reliability notes
-
-- Request timeout, retry, and exponential backoff are enabled for both APIs.
-- API payloads are cached locally in `.cache/` to speed reruns.
-- Partial failures degrade scores with confidence penalties instead of hard crash.
-- Run aborts if too many points fail both weather and soil data retrieval.
-
+- Retries, timeouts, and exponential backoff on outbound HTTP.
+- Responses cached under **`.cache/`** to speed repeated runs.
+- Partial missing data lowers confidence instead of failing the whole row.
+- The pipeline can abort if too many points fail **both** weather and soil fetches (`FAILURE_ABORT_RATIO`).

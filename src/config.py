@@ -81,6 +81,21 @@ def _default_date_range() -> tuple[str, str]:
     return start.isoformat(), end.isoformat()
 
 
+def resolve_bundled_data_csv(filename: str) -> Path | None:
+    """Find a repo CSV under ``datasets/`` or the project root (legacy layout)."""
+    search_roots = (
+        _PROJECT_ROOT / "datasets",
+        _PROJECT_ROOT,
+        Path.cwd() / "datasets",
+        Path.cwd(),
+    )
+    for root in search_roots:
+        candidate = (root / filename).resolve()
+        if candidate.is_file():
+            return candidate
+    return None
+
+
 def _resolve_soil_dataset_csv_path() -> Path | None:
     """Use europe_soil_climate_dataset.csv when present unless SOIL_DATASET_CSV disables it."""
     raw = os.getenv("SOIL_DATASET_CSV")
@@ -96,8 +111,7 @@ def _resolve_soil_dataset_csv_path() -> Path | None:
             return None
         candidate = Path(stripped)
         return candidate.resolve() if candidate.is_file() else None
-    candidate = Path("europe_soil_climate_dataset.csv")
-    return candidate.resolve() if candidate.is_file() else None
+    return resolve_bundled_data_csv("europe_soil_climate_dataset.csv")
 
 
 def resolve_nuts2_yields_csv_path() -> Path | None:
@@ -109,8 +123,7 @@ def resolve_nuts2_yields_csv_path() -> Path | None:
             return None
         candidate = Path(stripped)
         return candidate.resolve() if candidate.is_file() else None
-    candidate = Path("nuts2_crop_yields_all_regions.csv")
-    return candidate.resolve() if candidate.is_file() else None
+    return resolve_bundled_data_csv("nuts2_crop_yields_all_regions.csv")
 
 
 def resolve_land_prices_csv_path() -> Path | None:
@@ -122,8 +135,7 @@ def resolve_land_prices_csv_path() -> Path | None:
             return None
         candidate = Path(stripped)
         return candidate.resolve() if candidate.is_file() else None
-    candidate = Path("land_prices_clean.csv")
-    return candidate.resolve() if candidate.is_file() else None
+    return resolve_bundled_data_csv("land_prices_clean.csv")
 
 
 @dataclass(frozen=True)
@@ -146,12 +158,9 @@ class Settings:
     default_top_n: int
     default_start_date: str
     default_end_date: str
-    ollama_endpoint: str
-    ollama_model: str
     llm_timeout_seconds: float
     llm_max_points: int
     google_maps_api_key: str | None
-    llm_provider: str
     gemini_api_key: str | None
     gemini_model: str
     soil_dataset_csv_path: Path | None
@@ -174,11 +183,6 @@ class Settings:
                     except OSError:
                         pass
         gemini_api_key = _gemini_raw if _gemini_raw else None
-        _llm_explicit = os.getenv("LLM_PROVIDER", "").strip().lower()
-        if _llm_explicit in ("ollama", "gemini"):
-            llm_provider = _llm_explicit
-        else:
-            llm_provider = "gemini" if gemini_api_key else "ollama"
         _maps_raw = os.getenv("GOOGLE_MAPS_API_KEY", "").strip()
         google_maps_api_key = _maps_raw if _maps_raw else None
         _force_open_meteo = (
@@ -217,12 +221,9 @@ class Settings:
             default_top_n=_env_int("DEFAULT_TOP_N", 10),
             default_start_date=os.getenv("DEFAULT_START_DATE", default_start),
             default_end_date=os.getenv("DEFAULT_END_DATE", default_end),
-            ollama_endpoint=os.getenv("OLLAMA_ENDPOINT", "http://127.0.0.1:11434"),
-            ollama_model=os.getenv("OLLAMA_MODEL", "llama3"),
             llm_timeout_seconds=_env_float("LLM_TIMEOUT_SECONDS", 20.0),
             llm_max_points=_env_int("LLM_MAX_POINTS", 25),
             google_maps_api_key=google_maps_api_key,
-            llm_provider=llm_provider,
             gemini_api_key=gemini_api_key,
             gemini_model=os.getenv("GEMINI_MODEL", "gemini-2.5-flash").strip()
             or "gemini-2.5-flash",

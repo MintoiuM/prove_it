@@ -1,12 +1,18 @@
 from __future__ import annotations
 
 import json
+import os
 import random
+import warnings
 from dataclasses import dataclass
 from pathlib import Path
 from urllib.request import urlopen
 
 from src.types import CandidatePoint
+
+_NE_VECTOR_BASE = (
+    "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/"
+)
 
 
 @dataclass(frozen=True)
@@ -181,11 +187,48 @@ COUNTRY_ALIASES = {
     "ελλάδα": "greece",
 }
 
-BOUNDARY_SOURCE_URL = (
-    "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/"
-    "ne_110m_admin_0_countries.geojson"
-)
-BOUNDARY_CACHE_PATH = Path(".cache") / "boundaries" / "ne_110m_admin_0_countries.geojson"
+# Prefer 50m admin boundaries: 110m coastlines are too coarse and admit sea between islands.
+_BOUNDARY_CACHE_PATH_50M = Path(".cache") / "boundaries" / "ne_50m_admin_0_countries.geojson"
+_BOUNDARY_SOURCE_URL_50M = _NE_VECTOR_BASE + "ne_50m_admin_0_countries.geojson"
+_BOUNDARY_CACHE_PATH_110M = Path(".cache") / "boundaries" / "ne_110m_admin_0_countries.geojson"
+_BOUNDARY_SOURCE_URL_110M = _NE_VECTOR_BASE + "ne_110m_admin_0_countries.geojson"
+
+# Land mask cache key + rings (110m land bridges narrow seas; default is 50m).
+_LAND_RINGS_CACHE_KEY: str | None = None
+_LAND_RINGS_CACHE_RINGS: list[list[tuple[float, float]]] | None = None
+
+
+def natural_earth_land_cache_path() -> Path:
+    """On-disk path for the configured Natural Earth land GeoJSON (for tests / ops)."""
+    return _natural_earth_land_spec()[0]
+
+
+def _natural_earth_land_spec() -> tuple[Path, str, int]:
+    """Return (cache_path, download_url, timeout_seconds)."""
+    v = os.getenv("NATURAL_EARTH_LAND_RESOLUTION", "50").strip().lower()
+    if v in ("10", "10m"):
+        return (
+            Path(".cache") / "boundaries" / "ne_10m_land.geojson",
+            _NE_VECTOR_BASE + "ne_10m_land.geojson",
+            240,
+        )
+    if v in ("110", "110m"):
+        return (
+            Path(".cache") / "boundaries" / "ne_110m_land.geojson",
+            _NE_VECTOR_BASE + "ne_110m_land.geojson",
+            90,
+        )
+    return (
+        Path(".cache") / "boundaries" / "ne_50m_land.geojson",
+        _NE_VECTOR_BASE + "ne_50m_land.geojson",
+        120,
+    )
+
+
+def _clear_land_rings_cache() -> None:
+    global _LAND_RINGS_CACHE_KEY, _LAND_RINGS_CACHE_RINGS
+    _LAND_RINGS_CACHE_KEY = None
+    _LAND_RINGS_CACHE_RINGS = None
 
 
 def normalize_country_name(country: str) -> str:
@@ -257,10 +300,12 @@ def generate_candidate_points(
     else:
         lat_min, lat_max, lon_min, lon_max = _bbox_for_polygons(polygons)
 
+    land_rings = _land_rings_for_sampling_area(lat_min, lat_max, lon_min, lon_max)
+
     rng = random.Random(seed)
     points: list[CandidatePoint] = []
     attempts = 0
-    max_attempts = point_count * 800
+    max_attempts = point_count * (2500 if land_rings else 800)
 
     while len(points) < point_count:
         attempts += 1
@@ -278,6 +323,8 @@ def generate_candidate_points(
         if region_polys and not nuts_geo.point_in_any_region_polygon(
             lat, lon, region_polys
         ):
+            continue
+        if land_rings and not _point_in_any_polygon(lat, lon, land_rings):
             continue
 
         index = len(points)
@@ -335,18 +382,25 @@ def _load_country_polygons(
 
 
 def _load_natural_earth_features() -> list[dict]:
-    if not BOUNDARY_CACHE_PATH.exists():
-        BOUNDARY_CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
-        with urlopen(BOUNDARY_SOURCE_URL, timeout=20) as response:
-            payload = response.read().decode("utf-8")
-        BOUNDARY_CACHE_PATH.write_text(payload, encoding="utf-8")
-
-    raw = BOUNDARY_CACHE_PATH.read_text(encoding="utf-8")
-    geojson = json.loads(raw)
-    features = geojson.get("features", [])
-    if not isinstance(features, list):
-        return []
-    return features
+    """Try 50m admin countries first (tighter coasts), then 110m fallback."""
+    _BOUNDARY_CACHE_PATH_50M.parent.mkdir(parents=True, exist_ok=True)
+    candidates: list[tuple[Path, str, int]] = [
+        (_BOUNDARY_CACHE_PATH_50M, _BOUNDARY_SOURCE_URL_50M, 120),
+        (_BOUNDARY_CACHE_PATH_110M, _BOUNDARY_SOURCE_URL_110M, 60),
+    ]
+    for path, url, timeout in candidates:
+        try:
+            if not path.exists():
+                with urlopen(url, timeout=timeout) as response:
+                    path.write_text(response.read().decode("utf-8"), encoding="utf-8")
+            raw = path.read_text(encoding="utf-8")
+            geojson = json.loads(raw)
+            features = geojson.get("features", [])
+            if isinstance(features, list) and features:
+                return features
+        except Exception:
+            continue
+    return []
 
 
 def _extract_rings_from_polygon(coords: list) -> list[list[tuple[float, float]]]:
@@ -429,4 +483,101 @@ def _point_in_polygon(
                 inside = not inside
         j = i
     return inside
+
+
+def _geometry_to_land_rings(geometry: dict) -> list[list[tuple[float, float]]]:
+    gtype = geometry.get("type")
+    coordinates = geometry.get("coordinates", [])
+    if gtype == "Polygon":
+        return _extract_rings_from_polygon(coordinates)
+    if gtype == "MultiPolygon":
+        combined: list[list[tuple[float, float]]] = []
+        for poly_coords in coordinates:
+            combined.extend(_extract_rings_from_polygon(poly_coords))
+        return combined
+    return []
+
+
+def _load_all_land_rings() -> list[list[tuple[float, float]]]:
+    global _LAND_RINGS_CACHE_KEY, _LAND_RINGS_CACHE_RINGS
+    path, url, timeout = _natural_earth_land_spec()
+    cache_key = str(path.resolve())
+    if _LAND_RINGS_CACHE_KEY == cache_key and _LAND_RINGS_CACHE_RINGS is not None:
+        return _LAND_RINGS_CACHE_RINGS
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if not path.exists():
+        with urlopen(url, timeout=timeout) as response:
+            path.write_bytes(response.read())
+    raw = path.read_text(encoding="utf-8")
+    geojson = json.loads(raw)
+    features = geojson.get("features", [])
+    if not isinstance(features, list):
+        rings: list[list[tuple[float, float]]] = []
+        _LAND_RINGS_CACHE_KEY = cache_key
+        _LAND_RINGS_CACHE_RINGS = rings
+        return rings
+    rings = []
+    for feature in features:
+        if not isinstance(feature, dict):
+            continue
+        geom = feature.get("geometry")
+        if not isinstance(geom, dict):
+            continue
+        for ring in _geometry_to_land_rings(geom):
+            if len(ring) >= 3:
+                rings.append(ring)
+    _LAND_RINGS_CACHE_KEY = cache_key
+    _LAND_RINGS_CACHE_RINGS = rings
+    return rings
+
+
+def _bbox_intersects_bbox(
+    poly_bbox: tuple[float, float, float, float],
+    box: tuple[float, float, float, float],
+) -> bool:
+    lat_lo, lat_hi, lon_lo, lon_hi = poly_bbox
+    b_lat_lo, b_lat_hi, b_lon_lo, b_lon_hi = box
+    return not (
+        lat_hi < b_lat_lo
+        or lat_lo > b_lat_hi
+        or lon_hi < b_lon_lo
+        or lon_lo > b_lon_hi
+    )
+
+
+def _land_rings_for_sampling_area(
+    lat_min: float, lat_max: float, lon_min: float, lon_max: float
+) -> list[list[tuple[float, float]]]:
+    """Land polygons overlapping the sample bbox (Natural Earth land layer). Empty if load fails."""
+    try:
+        all_rings = _load_all_land_rings()
+    except Exception:
+        path, _, _ = _natural_earth_land_spec()
+        warnings.warn(
+            f"Could not load land mask ({path.name}); candidate points may include ocean. "
+            f"Run once online to cache {path}. "
+            "For narrow straits use NATURAL_EARTH_LAND_RESOLUTION=10 (ne_10m_land, larger download).",
+            UserWarning,
+            stacklevel=2,
+        )
+        return []
+    if not all_rings:
+        return []
+
+    def pick(box: tuple[float, float, float, float]) -> list[list[tuple[float, float]]]:
+        out: list[list[tuple[float, float]]] = []
+        for ring in all_rings:
+            if _bbox_intersects_bbox(_bbox_for_polygon(ring), box):
+                out.append(ring)
+        return out
+
+    sample = (lat_min, lat_max, lon_min, lon_max)
+    pad = 0.35
+    padded = (lat_min - pad, lat_max + pad, lon_min - pad, lon_max + pad)
+    selected = pick(padded)
+    if not selected:
+        selected = pick(sample)
+    if not selected:
+        return all_rings
+    return selected
 

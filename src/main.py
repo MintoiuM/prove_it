@@ -37,7 +37,6 @@ from src.output.recommendation import (
 )
 from src.output.rules_reasoning import build_site_reasoning
 from src.scoring.gemini_ranking import rank_with_gemini
-from src.scoring.llm_ranking import rank_with_llama3
 from src.scoring.suitability import rank_candidates
 from src.types import CandidatePoint
 
@@ -65,7 +64,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--use-llm",
         action="store_true",
-        help="Use Llama 3 (Ollama) to score and rank candidates.",
+        help="Use Gemini (GEMINI_API_KEY) to score and rerank the top LLM_MAX_POINTS candidates.",
     )
     parser.add_argument(
         "--risk-analysis",
@@ -341,32 +340,21 @@ def run_pipeline(
         )
         llm_cap = min(max(1, settings.llm_max_points), len(rules_first))
         llm_slice = rules_first[:llm_cap]
-        if settings.llm_provider == "gemini":
-            if not settings.gemini_api_key:
-                raise RuntimeError(
-                    "GEMINI_API_KEY is required when LLM_PROVIDER=gemini (or use LLM_PROVIDER=ollama)."
-                )
-            llm_ranked = rank_with_gemini(
-                candidate_rows=llm_slice,
-                crop=crop_profile.name,
-                api_key=settings.gemini_api_key,
-                model=settings.gemini_model,
-                timeout_seconds=settings.llm_timeout_seconds,
-                max_points=llm_cap,
-                extended_reasoning=extended_reasoning,
+        if not settings.gemini_api_key:
+            raise RuntimeError(
+                "GEMINI_API_KEY (or GEMINI_API_KEY_FILE) is required when --use-llm is set. "
+                "Add a key from Google AI Studio to the project .env at the repo root."
             )
-            ranking_engine = "gemini"
-        else:
-            llm_ranked = rank_with_llama3(
-                candidate_rows=llm_slice,
-                crop=crop_profile.name,
-                ollama_endpoint=settings.ollama_endpoint,
-                ollama_model=settings.ollama_model,
-                timeout_seconds=settings.llm_timeout_seconds,
-                max_points=llm_cap,
-                extended_reasoning=extended_reasoning,
-            )
-            ranking_engine = "llama3"
+        llm_ranked = rank_with_gemini(
+            candidate_rows=llm_slice,
+            crop=crop_profile.name,
+            api_key=settings.gemini_api_key,
+            model=settings.gemini_model,
+            timeout_seconds=settings.llm_timeout_seconds,
+            max_points=llm_cap,
+            extended_reasoning=extended_reasoning,
+        )
+        ranking_engine = "gemini"
         for row in llm_ranked:
             row["score"] = row["llm_score"]
             row["score_band"] = row["llm_rating"]
@@ -470,15 +458,7 @@ def run_pipeline(
         ranked_points=ranked_points,
         summary=summary,
         ranking_engine=ranking_engine,
-        llm_model=(
-            (
-                settings.gemini_model
-                if settings.llm_provider == "gemini"
-                else settings.ollama_model
-            )
-            if use_llm
-            else None
-        ),
+        llm_model=(settings.gemini_model if use_llm else None),
     )
 
     write_csv(run_dir / "candidates.csv", merged_rows)

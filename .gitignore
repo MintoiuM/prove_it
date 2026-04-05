@@ -2,3 +2,4 @@
 .env.example
 ssh_key
 ssh_key.pub
+.pytest_cache/
