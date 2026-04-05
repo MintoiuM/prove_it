@@ -1,0 +1,11 @@
+clay_pct,country,frost_risk,humidity_pct,lat,lon,mean_temp_c,nuts_region,point_id,rainfall_mm,soil_error,soil_ok,soil_organic_carbon_gkg,soil_ph,temp_std_c,weather_error,weather_ok,weather_stress_ratio,wind_speed_10m_kmh
+35.6,Hungary,0.0,52.65,47.469456,19.297705,9.055,Budapest,P001,355.145,,True,25.462,7.4,4.202,,True,0.0,10.933
+35.6,Hungary,0.0,51.346,47.463643,19.131488,9.371,Budapest,P002,373.395,,True,25.462,7.4,4.212,,True,0.0,10.425
+35.6,Hungary,0.0,53.996,47.564427,19.153384,9.005,Budapest,P003,387.265,,True,25.462,7.4,4.235,,True,0.0,10.6
+35.6,Hungary,0.0,51.392,47.53791,18.975678,8.553,Budapest,P004,435.445,,True,25.462,7.4,4.211,,True,0.0,11.412
+35.6,Hungary,0.0,54.108,47.565336,19.083966,9.089,Budapest,P005,409.895,,True,25.462,7.4,4.238,,True,0.0,10.542
+35.6,Hungary,0.0,52.192,47.515703,19.292959,8.98,Budapest,P006,356.605,,True,25.462,7.4,4.178,,True,0.0,10.921
+35.6,Hungary,0.0,51.829,47.529724,18.994925,8.976,Budapest,P007,423.4,,True,25.462,7.4,4.204,,True,0.0,11.162
+35.6,Hungary,0.0,51.892,47.459817,19.214819,9.28,Budapest,P008,366.095,,True,25.462,7.4,4.206,,True,0.0,10.55
+35.6,Hungary,0.0,50.529,47.485744,18.960495,8.763,Budapest,P009,422.305,,True,25.462,7.4,4.184,,True,0.0,11.417
+35.6,Hungary,0.0,50.529,47.513332,18.978605,8.763,Budapest,P010,422.305,,True,25.462,7.4,4.184,,True,0.0,11.417

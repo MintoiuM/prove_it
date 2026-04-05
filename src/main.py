@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import time
 import uuid
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -10,16 +11,22 @@ from typing import Any
 from src.collectors.europe_soil_csv import EuropeCsvSoilWorker
 from src.collectors.google_weather_worker import GoogleForecastWeatherWorker
 from src.collectors.http_utils import HttpJsonClient, RetryPolicy
+from src.collectors.open_meteo_validation import (
+    attach_open_meteo_history_to_top_candidates,
+    resolve_open_meteo_archive_endpoint,
+)
 from src.collectors.soil_worker import SoilWorker
 from src.collectors.weather_worker import WeatherWorker
-from src.config import Settings, resolve_nuts2_yields_csv_path
+from src.config import Settings, resolve_land_prices_csv_path, resolve_nuts2_yields_csv_path
+from src.data.land_prices import LandPriceStore
 from src.data.nuts2_yields import (
     Nuts2YieldStore,
     blend_rules_score_with_yield,
     crop_slug_to_yield_column,
     yield_to_score_0_100,
 )
-from src.geo.grid import generate_candidate_points
+from src.geo.grid import generate_candidate_points, normalize_country_name
+from src.geo.nuts import country_name_to_nuts_iso, find_nuts_region_name_for_point
 from src.io.cache import FileCache
 from src.models.crop_profiles import get_crop_profile, list_crop_names
 from src.output.recommendation import (
@@ -107,6 +114,82 @@ def main() -> int:
     )
     print(f"Artifacts: {result['run_dir']}")
     return 0
+
+
+def _field_size_hectares() -> float:
+    raw = os.getenv("FIELD_RENT_HECTARES", "10")
+    try:
+        v = float(raw)
+    except ValueError:
+        return 10.0
+    return max(0.01, min(1_000_000.0, v))
+
+
+def _land_monthly_rent_fraction_of_buyout() -> float:
+    """Monthly rent = this fraction × total field buy-out (default 1.8% per month)."""
+    raw = os.getenv("LAND_MONTHLY_RENT_PCT", "1.8")
+    try:
+        pct = float(raw)
+    except ValueError:
+        pct = 1.8
+    return max(0.0, min(100.0, pct)) / 100.0
+
+
+def _attach_land_rent_to_top_candidates(
+    rows: list[dict[str, Any]],
+    country_name: str,
+    land_store: LandPriceStore | None,
+    field_ha: float,
+) -> None:
+    """Attach buy-out (CSV €/ha purchase) and modelled monthly rent for top-N rows only."""
+    monthly_frac = _land_monthly_rent_fraction_of_buyout()
+    for row in rows:
+        row["field_hectares_for_land_estimate"] = field_ha
+        if land_store is None:
+            row["land_price_matched_region"] = None
+            row["land_buyout_eur_per_ha"] = None
+            row["land_value_data_year"] = None
+            row["land_buyout_field_eur"] = None
+            row["land_monthly_rent_eur"] = None
+            continue
+        try:
+            lat = float(row["lat"])
+            lon = float(row["lon"])
+        except (TypeError, ValueError, KeyError):
+            row["land_price_matched_region"] = None
+            row["land_buyout_eur_per_ha"] = None
+            row["land_value_data_year"] = None
+            row["land_buyout_field_eur"] = None
+            row["land_monthly_rent_eur"] = None
+            continue
+
+        iso = country_name_to_nuts_iso(normalize_country_name(country_name))
+        region_hint: str | None = None
+        if iso:
+            region_hint = find_nuts_region_name_for_point(lat, lon, iso)
+        if not region_hint and row.get("nuts_region"):
+            region_hint = str(row["nuts_region"]).strip() or None
+        if not region_hint:
+            region_hint = country_name
+
+        hit = land_store.lookup(region_hint) if region_hint else None
+        if hit is None:
+            hit = land_store.lookup(country_name)
+        if hit is None:
+            row["land_price_matched_region"] = None
+            row["land_buyout_eur_per_ha"] = None
+            row["land_value_data_year"] = None
+            row["land_buyout_field_eur"] = None
+            row["land_monthly_rent_eur"] = None
+            continue
+
+        buyout_per_ha, year, csv_label = hit
+        buyout_field = buyout_per_ha * field_ha
+        row["land_price_matched_region"] = csv_label
+        row["land_buyout_eur_per_ha"] = round(buyout_per_ha, 2)
+        row["land_value_data_year"] = year
+        row["land_buyout_field_eur"] = round(buyout_field, 2)
+        row["land_monthly_rent_eur"] = round(monthly_frac * buyout_field, 2)
 
 
 def _nuts2_yield_lookup_label(points: list[CandidatePoint]) -> str | None:
@@ -311,6 +394,48 @@ def run_pipeline(
     ranked_points.sort(
         key=lambda r: (-float(r.get("score") or 0.0), str(r.get("point_id", "")))
     )
+    field_ha_for_rent = _field_size_hectares()
+    land_path = resolve_land_prices_csv_path()
+    land_store = LandPriceStore(land_path) if land_path else None
+    _attach_land_rent_to_top_candidates(
+        ranked_points,
+        country_name=generated_points[0].country,
+        land_store=land_store,
+        field_ha=field_ha_for_rent,
+    )
+
+    om_validation_meta: dict[str, Any] = {}
+    if os.getenv("OPEN_METEO_VALIDATION", "1").strip().lower() not in (
+        "0",
+        "false",
+        "off",
+        "no",
+    ):
+        merged_by_id = {str(r["point_id"]): r for r in merged_rows}
+        archive_ep = resolve_open_meteo_archive_endpoint(settings.weather_endpoint)
+        validation_client = HttpJsonClient(
+            retry_policy=RetryPolicy(
+                timeout_seconds=settings.request_timeout_seconds,
+                retries=settings.request_retries,
+                backoff_base_seconds=settings.request_backoff_base_seconds,
+                backoff_max_seconds=settings.request_backoff_max_seconds,
+                min_interval_seconds=max(
+                    settings.weather_min_interval_seconds,
+                    0.25 if demo_safe else 0.12,
+                ),
+            ),
+            cache=cache,
+        )
+        om_validation_meta = attach_open_meteo_history_to_top_candidates(
+            ranked_points,
+            merged_by_id,
+            client=validation_client,
+            archive_endpoint=archive_ep,
+            start_date=start_date,
+            end_date=end_date,
+            max_workers=3 if demo_safe else 6,
+        )
+
     best_point = ranked_points[0]
     best_point["rules_reasoning"] = build_site_reasoning(best_point, crop_profile)
 
@@ -330,7 +455,11 @@ def run_pipeline(
         "risk_analysis_enabled": risk_analysis,
         "extended_reasoning_enabled": extended_reasoning,
         "region": generated_points[0].region,
+        "field_hectares_for_land_estimate": field_ha_for_rent,
+        "land_monthly_rent_pct_of_buyout": _land_monthly_rent_fraction_of_buyout() * 100.0,
+        "land_prices_csv_loaded": land_path is not None,
         **nuts_meta,
+        **om_validation_meta,
     }
 
     recommendation = build_recommendation_payload(

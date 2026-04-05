@@ -277,6 +277,20 @@ function _compareResultsRows(a, b, key) {{
     if (nb == null) return -1;
     return na - nb;
   }}
+  if (key === 'landrent') {{
+    const na = _numericField(a, 'land_monthly_rent_eur'), nb = _numericField(b, 'land_monthly_rent_eur');
+    if (na == null && nb == null) return 0;
+    if (na == null) return 1;
+    if (nb == null) return -1;
+    return na - nb;
+  }}
+  if (key === 'landbuyout') {{
+    const na = _numericField(a, 'land_buyout_field_eur'), nb = _numericField(b, 'land_buyout_field_eur');
+    if (na == null && nb == null) return 0;
+    if (na == null) return 1;
+    if (nb == null) return -1;
+    return na - nb;
+  }}
   if (key === 'score') {{
     return (Number(a.score) || 0) - (Number(b.score) || 0);
   }}
@@ -312,6 +326,12 @@ function _paintResultsTableBody() {{
     const ph = item.soil_ph != null ? Number(item.soil_ph).toFixed(2) : 'n/a';
     const temp = item.mean_temp_c != null ? Number(item.mean_temp_c).toFixed(1) + 'C' : 'n/a';
     const rain = item.rainfall_mm != null ? Number(item.rainfall_mm).toFixed(0) + ' mm' : 'n/a';
+    const rentMo = item.land_monthly_rent_eur != null
+      ? Number(item.land_monthly_rent_eur).toLocaleString(undefined, {{ maximumFractionDigits: 0 }}) + ' €'
+      : 'n/a';
+    const buyout = item.land_buyout_field_eur != null
+      ? Number(item.land_buyout_field_eur).toLocaleString(undefined, {{ maximumFractionDigits: 0 }}) + ' €'
+      : 'n/a';
     const score = Number(item.score || 0);
     const pct = Math.max(0, Math.min(100, score));
     return `
@@ -321,6 +341,8 @@ function _paintResultsTableBody() {{
         <td>${{ph}}</td>
         <td>${{temp}}</td>
         <td>${{rain}}</td>
+        <td>${{rentMo}}</td>
+        <td>${{buyout}}</td>
         <td>
           <div class="score-cell">
             <div class="bar-track"><div class="bar-fill" style="width:${{pct}}%"></div></div>
@@ -340,7 +362,7 @@ function onResultsSortHeaderClick(key) {{
     _sortState.dir = -_sortState.dir;
   }} else {{
     _sortState.key = key;
-    _sortState.dir = key === 'score' ? -1 : 1;
+    _sortState.dir = (key === 'score' || key === 'landrent' || key === 'landbuyout') ? -1 : 1;
   }}
   _paintResultsTableBody();
 }}
@@ -485,7 +507,7 @@ async function _renderResultMap(top) {{
     bounds.extend([m.lat, m.lon]);
   }});
   if (bounds.isValid()) {{
-    map.fitBounds(bounds, {{ padding: [28, 28], maxZoom: 11 }});
+    map.fitBounds(bounds, {{ padding: [52, 52], maxZoom: 11 }});
   }} else {{
     map.setView([markers[0].lat, markers[0].lon], 8);
   }}
@@ -656,6 +678,13 @@ function renderResults(result, payload) {{
     );
   }} else if (sum.nuts2_crop_in_file === false) {{
     reasonParts.push('Selected crop has no yield column in the NUTS2 file; regional yield was not applied.');
+  }}
+  if (best.open_meteo_history_validation_text) {{
+    const g = best.open_meteo_history_vs_run_grade;
+    if (g) {{
+      reasonParts.push(`Open-Meteo archive vs scoring run: ${{g}}.`);
+    }}
+    reasonParts.push(best.open_meteo_history_validation_text);
   }}
   ai.textContent = reasonParts.join('\\n\\n');
 }}

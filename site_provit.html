@@ -33,6 +33,8 @@
       --r-md: 10px;
       --r-lg: 16px;
       --r-xl: 24px;
+      /* Large landscape map (~reference screenshot): tall panel, capped so it stays usable */
+      --result-map-height: clamp(520px, 72vh, 960px);
     }
 
     html { font-size: 15px; }
@@ -309,6 +311,7 @@
       border: 0.5px solid var(--border);
       border-radius: var(--r-lg);
       border-style: dashed;
+      min-height: var(--result-map-height);
     }
     .empty-art { margin-bottom: 20px; opacity: 0.4; }
     .empty-art svg { width: 52px; height: 52px; stroke: var(--bark); }
@@ -325,6 +328,7 @@
       background: var(--cream);
       border: 0.5px solid var(--border);
       border-radius: var(--r-lg);
+      min-height: var(--result-map-height);
     }
     .loader-ring {
       width: 40px; height: 40px; border-radius: 50%;
@@ -441,14 +445,25 @@
       border-radius: var(--r-lg);
       padding: 20px 24px;
       margin-top: 16px;
+      flex-shrink: 0;
+      width: 100%;
+      min-width: 0;
     }
     .result-map {
-      height: min(72vh, 720px);
-      min-height: 480px;
+      width: 100%;
+      height: var(--result-map-height);
+      min-height: var(--result-map-height);
+      max-height: var(--result-map-height);
       border-radius: var(--r-md);
       overflow: hidden;
       border: 0.5px solid var(--border);
       background: var(--mist);
+    }
+    @media (max-width: 1100px) {
+      :root { --result-map-height: clamp(480px, 62vh, 820px); }
+    }
+    @media (max-width: 720px) {
+      :root { --result-map-height: clamp(300px, 48vh, 560px); }
     }
   </style>
 </head>
@@ -716,6 +731,8 @@
                 <th class="sortable" data-sort="ph" tabindex="0" role="columnheader" aria-sort="none">pH</th>
                 <th class="sortable" data-sort="temp" tabindex="0" role="columnheader" aria-sort="none">Avg temp</th>
                 <th class="sortable" data-sort="rain" tabindex="0" role="columnheader" aria-sort="none">Rainfall</th>
+                <th class="sortable" data-sort="landrent" tabindex="0" role="columnheader" aria-sort="none">Rent / mo</th>
+                <th class="sortable" data-sort="landbuyout" tabindex="0" role="columnheader" aria-sort="none">Buy-out</th>
                 <th class="sortable" data-sort="score" tabindex="0" role="columnheader" aria-sort="none">Score</th>
               </tr>
             </thead>

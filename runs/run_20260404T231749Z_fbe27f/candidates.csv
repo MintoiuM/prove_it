@@ -1,0 +1,11 @@
+clay_pct,country,frost_risk,humidity_pct,lat,lon,mean_temp_c,nuts_region,point_id,rainfall_mm,soil_error,soil_ok,soil_organic_carbon_gkg,soil_ph,temp_std_c,weather_error,weather_ok,weather_stress_ratio,wind_speed_10m_kmh
+18.7,Poland,0.071,64.167,50.877986,20.064436,5.586,Region Centralny,P001,667.585,,True,11.6,5.12,4.055,,True,0.0,14.137
+13.2,Poland,0.062,62.442,52.073551,19.400905,5.951,Region Centralny,P002,198.195,,True,12.47,5.11,4.206,,True,0.0,15.3
+18.7,Poland,0.071,60.688,51.76109,19.318704,5.857,Region Centralny,P003,301.49,,True,11.6,5.12,4.114,,True,0.0,14.662
+18.7,Poland,0.067,65.05,50.597678,20.656294,5.58,Region Centralny,P004,658.095,,True,11.6,5.12,4.029,,True,0.0,14.787
+13.2,Poland,0.075,61.638,51.944941,19.989702,5.856,Region Centralny,P005,292.73,,True,12.47,5.11,4.171,,True,0.0,15.417
+18.7,Poland,0.054,60.346,51.284438,18.33316,6.228,Region Centralny,P006,423.765,,True,11.6,5.12,4.284,,True,0.0,14.246
+18.7,Poland,0.058,62.329,51.068017,19.324341,5.786,Region Centralny,P007,485.085,,True,11.6,5.12,4.099,,True,0.0,14.233
+18.7,Poland,0.079,61.642,51.657448,20.002101,5.588,Region Centralny,P008,370.11,,True,11.6,5.12,4.126,,True,0.0,14.963
+18.4,Poland,0.075,64.221,51.003576,21.438656,5.67,Region Centralny,P009,731.095,,True,10.15,5.13,4.077,,True,0.0,14.804
+18.7,Poland,0.108,63.538,51.220978,20.56392,5.048,Region Centralny,P010,537.645,,True,11.6,5.12,4.074,,True,0.0,13.975

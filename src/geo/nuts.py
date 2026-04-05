@@ -114,7 +114,9 @@ def _normalize_label(label: str) -> str:
     s = "".join(ch for ch in s if not unicodedata.combining(ch))
     s = s.replace("—", "-").replace("–", "-").replace("ş", "s").replace("Ş", "S")
     s = s.lower()
-    s = re.sub(r"[^a-z0-9]+", " ", s)
+    # Keep letters/digits from any script (Greek, Cyrillic, …). ASCII-only [a-z0-9]
+    # strips exonyms like "Aττική" down to a single Latin "a" and breaks matching.
+    s = "".join(ch if (ch.isalnum() or ch.isspace()) else " " for ch in s)
     s = re.sub(r"\s+", " ", s).strip()
     return s
 
@@ -173,9 +175,13 @@ def _match_features(iso: str, region_label: str) -> list[dict[str, Any]]:
             loose: list[dict[str, Any]] = []
             for f in feats:
                 props = f.get("properties") or {}
-                for key in ("NUTS_NAME", "NAME_LATN"):
+                # Prefer Latin exonyms first (typical CSV / UI labels).
+                for key in ("NAME_LATN", "NUTS_NAME"):
                     nk = _fold_key(str(props.get(key, "")))
                     if not nk:
+                        continue
+                    short = min(len(nk), len(folded))
+                    if short < 4:
                         continue
                     if nk in folded or folded in nk:
                         loose.append(f)
@@ -281,6 +287,31 @@ def sampling_bbox_for_region_polys(
     rb = _bbox_for_polygons(region_polys)
     cb = _bbox_for_polygons(country_polys)
     return bbox_intersection(rb, cb)
+
+
+def fold_region_key(label: str) -> str:
+    """Public alias for matching regional CSV labels to NUTS names."""
+    return _fold_key(label)
+
+
+def find_nuts_region_name_for_point(lat: float, lon: float, iso: str) -> str | None:
+    """Return NUTS_NAME for the finest polygon (LEVL 2 before LEVL 1) containing the point."""
+    iso_u = iso.strip().upper()
+    for lev in (2, 1):
+        for feat in _features_for_iso(iso_u, lev):
+            geom = feat.get("geometry")
+            if not isinstance(geom, dict):
+                continue
+            for poly in geometry_to_latlon_polygons(geom):
+                if len(poly) >= 3 and _point_in_polygon(lat, lon, poly):
+                    props = feat.get("properties") or {}
+                    latn = props.get("NAME_LATN")
+                    if isinstance(latn, str) and latn.strip():
+                        return latn.strip()
+                    name = props.get("NUTS_NAME")
+                    if isinstance(name, str) and name.strip():
+                        return name.strip()
+    return None
 
 
 def region_dropdown_choices(

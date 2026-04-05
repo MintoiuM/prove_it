@@ -82,6 +82,19 @@ def resolve_nuts2_yields_csv_path() -> Path | None:
     return candidate.resolve() if candidate.is_file() else None
 
 
+def resolve_land_prices_csv_path() -> Path | None:
+    """Regional land purchase value EUR/ha (optional; used for buy-out + modelled rent)."""
+    raw = os.getenv("LAND_PRICES_CSV")
+    if raw is not None:
+        stripped = raw.strip()
+        if not stripped or stripped.lower() in ("none", "off", "0", "false"):
+            return None
+        candidate = Path(stripped)
+        return candidate.resolve() if candidate.is_file() else None
+    candidate = Path("land_prices_clean.csv")
+    return candidate.resolve() if candidate.is_file() else None
+
+
 @dataclass(frozen=True)
 class Settings:
     weather_endpoint: str
