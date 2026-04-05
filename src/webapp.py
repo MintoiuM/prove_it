@@ -9,7 +9,7 @@ from urllib.parse import parse_qs, urlparse
 
 from src.config import Settings, resolve_nuts2_yields_csv_path
 from src.data.nuts2_yields import Nuts2YieldStore
-from src.geo.grid import COUNTRY_ENVELOPES
+from src.geo.grid import COUNTRY_ENVELOPES, COUNTRY_POLYGONS
 from src.geo.nuts import region_dropdown_choices
 from src.main import run_pipeline
 from src.models.crop_profiles import crop_display_labels, list_crop_names
@@ -17,6 +17,17 @@ from src.models.crop_profiles import crop_display_labels, list_crop_names
 LAST_RESULT: dict | None = None
 LAST_ERROR: str | None = None
 TEMPLATE_PATH = Path("site_provit.html")
+
+
+def _country_polygons_for_ui() -> dict[str, list[list[float]]]:
+    """Simplified country rings as [[lat, lon], ...] keyed by display name for Leaflet."""
+    out: dict[str, list[list[float]]] = {}
+    for key, env in COUNTRY_ENVELOPES.items():
+        ring = COUNTRY_POLYGONS.get(key)
+        if not ring:
+            continue
+        out[env.name] = [[float(lat), float(lon)] for lat, lon in ring]
+    return out
 
 
 class CropSuitabilityHandler(BaseHTTPRequestHandler):
@@ -217,6 +228,7 @@ def _render_page(result: dict | None = None, error: str | None = None) -> str:
         "initial_result": result,
         "initial_error": error,
         "google_maps_api_key": settings.google_maps_api_key,
+        "country_polygons": _country_polygons_for_ui(),
     }
     template_html = TEMPLATE_PATH.read_text(encoding="utf-8")
     bridge = _build_bridge_script(app_state)
@@ -236,6 +248,155 @@ let _mapsLoadPromise = null;
 let _resultsRows = [];
 let _lastPayloadForResults = null;
 let _sortState = {{ key: null, dir: 1 }};
+let _narrationTimers = [];
+let _regionMapInstance = null;
+
+function _clearNarrationTimers() {{
+  _narrationTimers.forEach((id) => clearTimeout(id));
+  _narrationTimers = [];
+}}
+
+function appendAiConsoleLine(text) {{
+  const out = document.getElementById('ai-console-out');
+  if (!out) return;
+  const ts = new Date().toLocaleTimeString(undefined, {{ hour12: false }});
+  const line = '[' + ts + '] ' + text;
+  out.textContent = (out.textContent ? out.textContent + '\\n' : '') + line;
+  out.scrollTop = out.scrollHeight;
+}}
+
+function resetAiConsoleForRun() {{
+  const out = document.getElementById('ai-console-out');
+  if (out) out.textContent = '';
+  const body = document.getElementById('ai-console-score-body');
+  if (body) {{
+    body.textContent = 'Waiting for the run to finish…';
+    body.classList.add('placeholder');
+  }}
+}}
+
+function startAiActivityNarration(payload) {{
+  _clearNarrationTimers();
+  resetAiConsoleForRun();
+  const crop = payload.crop || '';
+  const pts = payload.points;
+  const demo = !!payload.demo_safe;
+  const schedule = (ms, msg) => {{
+    _narrationTimers.push(setTimeout(() => appendAiConsoleLine(msg), ms));
+  }};
+  schedule(80, 'Starting pipeline: reading configuration and crop profile.');
+  schedule(500, 'Loaded ideal ranges for "' + crop + '" (temperature, moisture, soil pH, and related limits from the profile).');
+  schedule(1100, 'Drawing ' + pts + ' candidate coordinates inside the country' + (payload.region ? ' / NUTS region' : '') + ' polygon (deterministic from your seed).');
+  schedule(2200, 'Fetching weather: hourly series aggregated to growing-season signals (temp, rain, humidity, wind, stress proxies).');
+  schedule(3600, 'Fetching soil: pH, organic carbon, and texture where the soil API or local CSV provides data.');
+  schedule(5200, 'Scoring every site: distance-to-ideal, hard constraint penalties, and missing-data handling.');
+  if (payload.use_llm) {{
+    schedule(6800, 'Calling the LLM to rank and narrate the top ' + (payload.top_n || '') + ' candidates (hybrid with rules for the rest).');
+  }}
+  if (payload.risk_analysis) {{
+    schedule(payload.use_llm ? 8400 : 6800, 'Computing risk layer: frost exposure, weather stress, wind, and surface moisture indicators.');
+  }}
+  const mergeAt = payload.use_llm ? 10000 : 7600;
+  schedule(mergeAt, 'Applying optional NUTS2 yield blend, land buy-out/rent estimates, and Open-Meteo archive cross-check on the shortlist.');
+  schedule(mergeAt + 1200, (demo ? 'Demo-safe mode: using cache and gentle API pacing where applicable.' : 'Live mode: requests sent to weather and soil providers with retries.'));
+}}
+
+function finishAiActivityNarration(ok, errMsg, result, payload) {{
+  _clearNarrationTimers();
+  if (ok && result) {{
+    appendAiConsoleLine('Run finished successfully. Ranked ' + (result.top_candidates || []).length + ' top site(s).');
+    const body = document.getElementById('ai-console-score-body');
+    if (body) {{
+      body.classList.remove('placeholder');
+      body.textContent = buildScoreInsightText(result, payload);
+    }}
+  }} else {{
+    appendAiConsoleLine('Run failed: ' + (errMsg || 'unknown error'));
+    const body = document.getElementById('ai-console-score-body');
+    if (body) {{
+      body.classList.remove('placeholder');
+      body.textContent = 'No score breakdown available because the run did not complete.';
+    }}
+  }}
+}}
+
+function buildScoreInsightText(result, payload) {{
+  const best = result.best_point || {{}};
+  const parts = [];
+  if (best.llm_reasoning) parts.push(best.llm_reasoning);
+  if (best.rules_reasoning) {{
+    if (best.llm_reasoning) parts.push('—');
+    parts.push(best.rules_reasoning);
+  }} else if (!best.llm_reasoning) {{
+    parts.push('Rules-based ranking: the score is the suitability model (0–100) from weather and soil fit to crop targets, minus penalties for missing data or hard threshold violations.');
+  }}
+  if (payload.risk_analysis && best.risk_level) {{
+    parts.push('Risk level: ' + String(best.risk_level).toUpperCase() + ' (index ' + Number(best.risk_index || 0).toFixed(2) + ').');
+    if (best.risk_summary) parts.push('Risk detail: ' + best.risk_summary);
+  }}
+  const sum = result.summary || {{}};
+  if (sum.nuts2_yield_applied) {{
+    parts.push('Regional yield (NUTS2 file): ' + sum.nuts2_yield_tons_ha + ' t/ha' + (sum.nuts2_yield_year ? ' (' + sum.nuts2_yield_year + ')' : '') + ', blended into the score.');
+  }} else if (sum.nuts2_crop_in_file === false) {{
+    parts.push('No yield column for this crop in the NUTS2 file; regional yield was not applied.');
+  }}
+  if (best.open_meteo_history_validation_text) {{
+    const g = best.open_meteo_history_vs_run_grade;
+    if (g) parts.push('Open-Meteo archive vs scoring run: ' + g + '.');
+    parts.push(best.open_meteo_history_validation_text);
+  }}
+  return parts.join('\\n\\n');
+}}
+
+function switchMainView(name) {{
+  const titles = {{ analysis: 'Site analysis', 'ai-console': 'AI activity', 'region-map': 'Region map' }};
+  const titleEl = document.getElementById('page-title');
+  if (titleEl && titles[name]) titleEl.textContent = titles[name];
+  document.querySelectorAll('.main-view').forEach((el) => {{
+    const on = el.id === 'view-' + name;
+    el.classList.toggle('is-active', on);
+    el.setAttribute('aria-hidden', on ? 'false' : 'true');
+  }});
+  document.querySelectorAll('.nav-item[data-main-view]').forEach((el) => {{
+    el.classList.toggle('active', el.getAttribute('data-main-view') === name);
+  }});
+  if (name === 'region-map') {{
+    setTimeout(() => paintRegionOutlineMap(), 30);
+  }}
+}}
+
+function paintRegionOutlineMap() {{
+  const el = document.getElementById('region-map-canvas');
+  if (!el || typeof L === 'undefined') return;
+  const country = document.getElementById('country') && document.getElementById('country').value;
+  const regionSel = document.getElementById('region');
+  const regionLabel = regionSel && regionSel.value ? regionSel.options[regionSel.selectedIndex].text : 'Whole country';
+  const polys = (APP_STATE.country_polygons || {{}});
+  const ring = polys[country];
+  if (_regionMapInstance) {{
+    _regionMapInstance.remove();
+    _regionMapInstance = null;
+  }}
+  el.replaceChildren();
+  if (!ring || ring.length < 3) {{
+    el.textContent = 'No outline available for this country in the UI dataset.';
+    return;
+  }}
+  const map = L.map(el, {{ scrollWheelZoom: true }});
+  _regionMapInstance = map;
+  L.tileLayer('https://{{s}}.tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png', {{
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap'
+  }}).addTo(map);
+  const latlngs = ring.map((p) => [p[0], p[1]]);
+  const poly = L.polygon(latlngs, {{ color: '#5A8A40', weight: 2, fillColor: '#8BBE6A', fillOpacity: 0.15 }}).addTo(map);
+  map.fitBounds(poly.getBounds(), {{ padding: [28, 28] }});
+  L.popup({{ maxWidth: 260 }})
+    .setLatLng(poly.getBounds().getCenter())
+    .setContent('<strong>' + _escAttr(country) + '</strong><br/>' + _escAttr(regionLabel) + '<br/><span style="font-size:11px;opacity:.85">Simplified border for sampling</span>')
+    .openOn(map);
+  setTimeout(() => map.invalidateSize(), 200);
+}}
 
 function _numericField(row, field) {{
   const v = row[field];
@@ -603,6 +764,8 @@ async function handleRun() {{
     extended_reasoning: _isExtendedReasoning()
   }};
 
+  startAiActivityNarration(payload);
+
   try {{
     const response = await fetch('/run-json', {{
       method: 'POST',
@@ -614,6 +777,7 @@ async function handleRun() {{
       throw new Error(data.error || 'Run failed');
     }}
     renderResults(data.result, payload);
+    finishAiActivityNarration(true, null, data.result, payload);
     dot.className = 'status-dot';
     statusText.textContent = 'Ready';
   }} catch (err) {{
@@ -626,6 +790,7 @@ async function handleRun() {{
     const ai = document.getElementById('ai-text');
     ai.className = 'ai-text';
     ai.textContent = 'Error: ' + err.message;
+    finishAiActivityNarration(false, err.message, null, payload);
     dot.className = 'status-dot';
     statusText.textContent = 'Error';
   }} finally {{
@@ -651,42 +816,12 @@ function renderResults(result, payload) {{
   _paintResultsTableBody();
   const ai = document.getElementById('ai-text');
   ai.className = 'ai-text';
-  const reasonParts = [];
-  if (best.llm_reasoning) {{
-    reasonParts.push(best.llm_reasoning);
+  ai.textContent = buildScoreInsightText(result, payload);
+  const acBody = document.getElementById('ai-console-score-body');
+  if (acBody) {{
+    acBody.classList.remove('placeholder');
+    acBody.textContent = buildScoreInsightText(result, payload);
   }}
-  if (best.rules_reasoning) {{
-    if (best.llm_reasoning) reasonParts.push('—');
-    reasonParts.push(best.rules_reasoning);
-  }} else if (!best.llm_reasoning) {{
-    reasonParts.push('Rules-based ranking completed.');
-  }}
-  if (payload.risk_analysis && best.risk_level) {{
-    reasonParts.push(`Risk level: ${{best.risk_level.toUpperCase()}} (${{
-      Number(best.risk_index || 0).toFixed(2)
-    }}).`);
-    if (best.risk_summary) {{
-      reasonParts.push(`Risk insight: ${{best.risk_summary}}`);
-    }}
-  }}
-  const sum = result.summary || {{}};
-  if (sum.nuts2_yield_applied) {{
-    reasonParts.push(
-      `Regional yield benchmark (NUTS2 file): ${{sum.nuts2_yield_tons_ha}} t/ha` +
-      (sum.nuts2_yield_year ? ` (${{sum.nuts2_yield_year}})` : '') +
-      ', blended into suitability score.'
-    );
-  }} else if (sum.nuts2_crop_in_file === false) {{
-    reasonParts.push('Selected crop has no yield column in the NUTS2 file; regional yield was not applied.');
-  }}
-  if (best.open_meteo_history_validation_text) {{
-    const g = best.open_meteo_history_vs_run_grade;
-    if (g) {{
-      reasonParts.push(`Open-Meteo archive vs scoring run: ${{g}}.`);
-    }}
-    reasonParts.push(best.open_meteo_history_validation_text);
-  }}
-  ai.textContent = reasonParts.join('\\n\\n');
 }}
 
 (function initTemplateBinding() {{
@@ -704,7 +839,21 @@ function renderResults(result, payload) {{
   countryEl.value = defaults.country || countries[0];
   cropEl.value = defaults.crop || crops[0];
 
-  countryEl.addEventListener('change', () => {{ updateBreadcrumb(); refreshRegions(); }});
+  countryEl.addEventListener('change', () => {{
+    updateBreadcrumb();
+    refreshRegions();
+    const rm = document.getElementById('view-region-map');
+    if (rm && rm.classList.contains('is-active')) paintRegionOutlineMap();
+  }});
+  const panelIn = document.querySelector('.panel-inputs');
+  if (panelIn) {{
+    panelIn.addEventListener('change', (ev) => {{
+      const t = ev.target;
+      if (!t || (t.id !== 'region' && t.id !== 'country')) return;
+      const rm = document.getElementById('view-region-map');
+      if (rm && rm.classList.contains('is-active')) paintRegionOutlineMap();
+    }});
+  }}
   refreshRegions().then(() => {{
     const regEl = document.getElementById('region');
     if (regEl && defaults.region) regEl.value = defaults.region;
@@ -750,12 +899,19 @@ function renderResults(result, payload) {{
     ai.textContent = 'Last error: ' + APP_STATE.initial_error;
   }}
   if (APP_STATE.initial_result) {{
-    renderResults(APP_STATE.initial_result, {{
+    const initPayload = {{
       points: defaults.points || 10,
       top_n: defaults.top_n || 5,
       seed: defaults.seed || 42,
       risk_analysis: !!defaults.risk_analysis
-    }});
+    }};
+    renderResults(APP_STATE.initial_result, initPayload);
+    appendAiConsoleLine('[session] Restored previous run from server.');
+    const acBody = document.getElementById('ai-console-score-body');
+    if (acBody) {{
+      acBody.classList.remove('placeholder');
+      acBody.textContent = buildScoreInsightText(APP_STATE.initial_result, initPayload);
+    }}
     document.getElementById('results-empty').style.display = 'none';
     document.getElementById('results-content').style.display = 'flex';
   }}

@@ -1,0 +1,11 @@
+clay_pct,country,frost_risk,humidity_pct,lat,lon,mean_temp_c,nuts_region,point_id,rainfall_mm,soil_error,soil_ok,soil_organic_carbon_gkg,soil_ph,temp_std_c,weather_error,weather_ok,weather_stress_ratio,wind_speed_10m_kmh
+28.4,Germany,0.0,64.292,49.145955,10.868803,7.919,Mittelfranken,P001,303.315,,True,20.532,6.45,4.244,,True,0.0,9.779
+26.0,Germany,0.0,63.763,49.638568,10.603878,8.241,Mittelfranken,P002,339.815,,True,17.748,6.67,4.09,,True,0.0,10.0
+26.0,Germany,0.0,63.671,49.509824,10.571058,8.092,Mittelfranken,P003,315.725,,True,17.748,6.67,4.077,,True,0.0,10.354
+28.4,Germany,0.0,63.317,49.030458,11.105111,7.676,Mittelfranken,P004,371.57,,True,20.532,6.45,4.1,,True,0.0,10.454
+28.4,Germany,0.0,64.438,48.925418,10.91338,8.037,Mittelfranken,P005,316.82,,True,20.532,6.45,4.195,,True,0.0,10.046
+26.0,Germany,0.0,63.729,49.675508,10.428139,8.338,Mittelfranken,P006,320.835,,True,17.748,6.67,3.982,,True,0.0,10.254
+26.0,Germany,0.0,62.263,49.585576,10.838964,8.292,Mittelfranken,P007,450.41,,True,17.748,6.67,4.134,,True,0.0,9.85
+28.4,Germany,0.0,65.779,49.313427,10.177565,8.098,Mittelfranken,P008,254.04,,True,20.532,6.45,3.967,,True,0.0,11.129
+28.4,Germany,0.0,65.862,49.224254,10.573309,7.737,Mittelfranken,P009,240.9,,True,20.532,6.45,4.19,,True,0.0,10.1
+28.4,Germany,0.0,65.842,49.128401,10.696885,7.964,Mittelfranken,P010,263.895,,True,20.532,6.45,4.202,,True,0.0,10.1

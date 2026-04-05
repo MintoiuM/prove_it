@@ -114,7 +114,24 @@
     }
 
     /* ── Main ── */
-    .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .main { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+    .main-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      min-width: 0;
+    }
+    .main-view {
+      flex: 1;
+      display: none;
+      flex-direction: column;
+      min-height: 0;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .main-view.is-active { display: flex; }
+    #view-analysis { overflow: auto; }
 
     .topbar {
       background: var(--cream);
@@ -465,6 +482,78 @@
     @media (max-width: 720px) {
       :root { --result-map-height: clamp(300px, 48vh, 560px); }
     }
+
+    .ai-console-page, .region-map-page {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 28px 36px;
+      gap: 16px;
+      min-height: 0;
+      background: var(--parchment);
+    }
+    .ai-console-card {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      background: var(--cream);
+      border: 0.5px solid var(--border);
+      border-radius: var(--r-lg);
+      overflow: hidden;
+    }
+    .ai-console-header {
+      padding: 14px 18px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--moss);
+      border-bottom: 0.5px solid var(--border);
+      background: var(--mist);
+    }
+    .ai-console-scroll {
+      flex: 1;
+      min-height: 180px;
+      max-height: min(42vh, 520px);
+      overflow: auto;
+      margin: 0;
+      padding: 16px 18px;
+      font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, monospace;
+      font-size: 12px;
+      line-height: 1.65;
+      color: var(--text-mid);
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: #1e1c18;
+      color: #d4cfc4;
+    }
+    .ai-console-score {
+      flex-shrink: 0;
+      padding: 18px 20px 22px;
+      border-top: 0.5px solid var(--border);
+      background: var(--cream);
+    }
+    .ai-console-score-body {
+      margin-top: 10px;
+      font-size: 13px;
+      line-height: 1.75;
+      color: var(--text-mid);
+      white-space: pre-wrap;
+    }
+    .region-map-canvas {
+      flex: 1;
+      min-height: var(--result-map-height);
+      border-radius: var(--r-md);
+      border: 0.5px solid var(--border);
+      background: var(--mist);
+    }
+    .region-map-hint {
+      font-size: 13px;
+      color: var(--text-soft);
+      max-width: 720px;
+      line-height: 1.5;
+    }
   </style>
 </head>
 <body>
@@ -488,24 +577,20 @@
   <nav class="nav">
     <div class="nav-section">
       <div class="nav-label">Analysis</div>
-      <div class="nav-item active">
+      <div class="nav-item active" id="nav-analysis" role="button" tabindex="0" data-main-view="analysis"
+           onclick="switchMainView('analysis')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();switchMainView('analysis');}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
         Site analysis
       </div>
-      <div class="nav-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><path d="M7 16l4-4 4 4 4-6"/></svg>
-        Historical runs
+      <div class="nav-item" id="nav-ai-console" role="button" tabindex="0" data-main-view="ai-console"
+           onclick="switchMainView('ai-console')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();switchMainView('ai-console');}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v10H4z"/><path d="M8 18h8"/><path d="M9 14h1"/><path d="M12 14h1"/><path d="M15 14h1"/></svg>
+        AI activity
       </div>
-      <div class="nav-item">
+      <div class="nav-item" id="nav-region-map" role="button" tabindex="0" data-main-view="region-map"
+           onclick="switchMainView('region-map')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();switchMainView('region-map');}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
         Region map
-      </div>
-    </div>
-    <div class="nav-section">
-      <div class="nav-label">Settings</div>
-      <div class="nav-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
-        Preferences
       </div>
     </div>
   </nav>
@@ -517,7 +602,7 @@
 <div class="main">
   <header class="topbar">
     <div class="topbar-left">
-      <h1 class="page-title">Site analysis</h1>
+      <h1 class="page-title" id="page-title">Site analysis</h1>
       <span class="breadcrumb">Europe / Romania</span>
     </div>
     <div class="topbar-right">
@@ -532,6 +617,8 @@
     </div>
   </header>
 
+  <div class="main-body">
+  <div class="main-view is-active" id="view-analysis">
   <div class="content">
 
     <!-- Left: inputs -->
@@ -764,90 +851,31 @@
 
     </div>
   </div>
+  </div>
+
+  <div class="main-view" id="view-ai-console" aria-hidden="true">
+    <div class="ai-console-page">
+      <p class="region-map-hint">Live log of what the pipeline is doing while a run is in progress. After each run, the section below explains how the top site’s score was produced (rules, optional LLM, risk, regional yield, and weather validation).</p>
+      <div class="ai-console-card">
+        <div class="ai-console-header">Pipeline log</div>
+        <pre class="ai-console-scroll" id="ai-console-out" aria-live="polite"></pre>
+        <div class="ai-console-score">
+          <div class="ai-label" style="margin-bottom:0;">How the top score was reached</div>
+          <div class="ai-console-score-body placeholder" id="ai-console-score-body">Run an analysis to see a plain-language breakdown of scoring and ranking.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-view" id="view-region-map" aria-hidden="true">
+    <div class="region-map-page">
+      <p class="region-map-hint">Approximate country outline used for sampling (simplified polygon). NUTS sub-regions use the same borders in the engine; pick a country and region on <strong>Site analysis</strong>, then return here to see the national footprint.</p>
+      <div id="region-map-canvas" class="region-map-canvas" role="img" aria-label="Country outline map"></div>
+    </div>
+  </div>
+  </div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<script>
-  function updateBreadcrumb() {
-    const country = document.getElementById('country').value;
-    document.querySelector('.breadcrumb').textContent = 'Europe / ' + country;
-  }
-
-  function selectMode(el) {
-    document.querySelectorAll('.mode-card').forEach(c => {
-      c.classList.remove('active');
-      c.querySelector('.mode-indicator').innerHTML = '';
-    });
-    el.classList.add('active');
-    el.querySelector('.mode-indicator').innerHTML = '<div class="mode-dot"></div>';
-  }
-
-  function handleRun() {
-    const btn = document.getElementById('run-btn');
-    const dot = document.getElementById('status-dot');
-    const statusText = document.getElementById('status-text');
-    const country = document.getElementById('country').value;
-
-    btn.disabled = true;
-    dot.className = 'status-dot busy';
-    statusText.textContent = 'Running…';
-
-    document.getElementById('results-empty').style.display = 'none';
-    document.getElementById('results-loading').style.display = 'flex';
-    document.getElementById('results-content').style.display = 'none';
-    document.getElementById('loading-country').textContent = country;
-
-    // Simulate async — replace this with your real fetch('/run', ...) call
-    setTimeout(() => {
-      showDemoResults();
-      btn.disabled = false;
-      dot.className = 'status-dot';
-      statusText.textContent = 'Ready';
-      document.getElementById('results-loading').style.display = 'none';
-      document.getElementById('results-content').style.display = 'flex';
-    }, 1800);
-  }
-
-  function showDemoResults() {
-    const crop = document.getElementById('crop').value;
-    const country = document.getElementById('country').value;
-    const pts = document.getElementById('pts-val').textContent;
-    const topN = document.getElementById('top-val').textContent;
-    const seed = document.getElementById('seed').value;
-
-    document.getElementById('stat-sampled').textContent = pts;
-    document.getElementById('stat-returned').textContent = topN;
-    document.getElementById('stat-top').innerHTML = '—<span class="stat-unit"> %</span>';
-    document.getElementById('stat-seed').textContent = seed;
-    document.getElementById('results-title').textContent = `Top sites — ${crop} in ${country}`;
-
-    // Placeholder rows — replace with real data from your backend
-    const rows = [
-      { rank: 1, lat: '44.2134', lon: '26.0912', ph: '6.8', temp: '12.4°C', rain: '540 mm', score: null },
-      { rank: 2, lat: '45.6301', lon: '27.4481', ph: '7.1', temp: '11.8°C', rain: '510 mm', score: null },
-      { rank: 3, lat: '43.8712', lon: '25.3156', ph: '6.5', temp: '13.1°C', rain: '480 mm', score: null },
-    ];
-
-    document.getElementById('results-tbody').innerHTML = rows.map(r => `
-      <tr>
-        <td><div class="rank-num ${r.rank === 1 ? 'top' : ''}">${r.rank}</div></td>
-        <td><span class="coord">${r.lat}°N, ${r.lon}°E</span></td>
-        <td>${r.ph}</td>
-        <td>${r.temp}</td>
-        <td>${r.rain}</td>
-        <td>
-          <div class="score-cell">
-            <div class="bar-track"><div class="bar-fill" style="width:0%"></div></div>
-            <span class="score-pct">—</span>
-          </div>
-        </td>
-      </tr>
-    `).join('');
-
-    document.getElementById('ai-text').className = 'ai-text placeholder';
-    document.getElementById('ai-text').textContent =
-      'Connect your backend and enable AI recommendations to see agronomic insights here.';
-  }
-</script>
 </body>
 </html>
